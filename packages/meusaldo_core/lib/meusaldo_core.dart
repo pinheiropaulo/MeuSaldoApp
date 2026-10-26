@@ -1,8 +1,9 @@
-/// Support for doing something awesome.
+/// Biblioteca de domínio financeiro MeuSaldo.
 ///
-/// More dartdocs go here.
+/// Implementa regras financeiras, entidades, objetos de valor e contratos em Dart puro.
 library;
 
-export 'src/meusaldo_core_base.dart';
-
-// TODO: Export any libraries intended for clients of this package.
+export 'package:meusaldo_core/src/accounts/accounts.dart';
+export 'package:meusaldo_core/src/categories/categories.dart';
+export 'package:meusaldo_core/src/shared/shared.dart';
+export 'package:meusaldo_core/src/transactions/transactions.dart';
