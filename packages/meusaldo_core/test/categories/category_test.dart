@@ -34,7 +34,7 @@ void main() {
       expect(catBoth.isCompatibleWith(TransactionType.expense), isTrue);
     });
 
-    test('rejeita nome vazio', () {
+    test('rejeita nome ou id vazio na criação e no copyWith', () {
       expect(
         () => Category.create(
           id: 'cat-inv',
@@ -43,6 +43,20 @@ void main() {
         ),
         throwsArgumentError,
       );
+
+      final cat = Category.create(
+        id: 'cat-1',
+        name: 'Saúde',
+        type: CategoryType.expense,
+      );
+
+      expect(() => cat.copyWith(name: ''), throwsArgumentError);
+      expect(() => cat.copyWith(name: '   '), throwsArgumentError);
+      expect(() => cat.copyWith(id: ''), throwsArgumentError);
+      expect(() => cat.copyWith(id: '   '), throwsArgumentError);
+
+      final updated = cat.copyWith(name: 'Saúde & Bem-estar');
+      expect(updated.name, equals('Saúde & Bem-estar'));
     });
   });
 }

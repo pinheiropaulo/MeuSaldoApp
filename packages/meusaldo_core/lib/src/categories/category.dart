@@ -44,6 +44,15 @@ class Category {
     String? description,
     bool isArchived = false,
   }) {
+    final trimmedId = id.trim();
+    if (trimmedId.isEmpty) {
+      throw ArgumentError.value(
+        id,
+        'id',
+        'O identificador da categoria não pode ser vazio.',
+      );
+    }
+
     final trimmedName = name.trim();
     if (trimmedName.isEmpty) {
       throw ArgumentError.value(
@@ -54,7 +63,7 @@ class Category {
     }
 
     return Category(
-      id: id,
+      id: trimmedId,
       name: trimmedName,
       type: type,
       iconKey: iconKey,
@@ -84,7 +93,7 @@ class Category {
     String? description,
     bool? isArchived,
   }) {
-    return Category(
+    return Category.create(
       id: id ?? this.id,
       name: name ?? this.name,
       type: type ?? this.type,

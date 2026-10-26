@@ -130,5 +130,50 @@ void main() {
         throwsArgumentError,
       );
     });
+    test('copyWith preserva integridade e validações de Transaction.create', () {
+      final tx = Transaction.create(
+        id: 'tx-1',
+        type: TransactionType.expense,
+        amount: const Money.fromCents(5000),
+        date: DateTime.now(),
+        description: 'Mercado',
+        accountId: 'acc-1',
+      );
+
+      final updated = tx.copyWith(amount: const Money.fromCents(6000));
+      expect(updated.amount.cents, equals(6000));
+      expect(updated.description, equals('Mercado'));
+
+      // Rejeita valor zero ou negativo via copyWith
+      expect(
+        () => tx.copyWith(amount: const Money.zero()),
+        throwsArgumentError,
+      );
+      expect(
+        () => tx.copyWith(amount: const Money.fromCents(-100)),
+        throwsArgumentError,
+      );
+
+      // Rejeita descrição vazia via copyWith
+      expect(() => tx.copyWith(description: ''), throwsArgumentError);
+      expect(() => tx.copyWith(description: '   '), throwsArgumentError);
+
+      // Rejeita conta de origem vazia via copyWith
+      expect(() => tx.copyWith(accountId: ''), throwsArgumentError);
+      expect(() => tx.copyWith(accountId: '   '), throwsArgumentError);
+
+      // Rejeita transferência com destino nulo ou igual à origem via copyWith
+      expect(
+        () => tx.copyWith(type: TransactionType.transfer),
+        throwsArgumentError,
+      );
+      expect(
+        () => tx.copyWith(
+          type: TransactionType.transfer,
+          destinationAccountId: 'acc-1',
+        ),
+        throwsArgumentError,
+      );
+    });
   });
 }
