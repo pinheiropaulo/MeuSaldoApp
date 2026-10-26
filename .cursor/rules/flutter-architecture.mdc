@@ -1,0 +1,17 @@
+---
+description: Mantém as regras de arquitetura e design do MeuSaldo em arquivos Dart e Flutter.
+globs: "**/*.dart"
+alwaysApply: false
+---
+
+# MeuSaldo Flutter
+
+- Leia `docs/AI_CONTEXT.md`, `docs/ARCHITECTURE.md` e `docs/organizacao-do-projeto.md` antes de implementar.
+- Regras financeiras, entidades e casos de uso ficam em `packages/meusaldo_core`, sem dependência de Flutter.
+- UI, navegação, plugins e adaptadores ficam em `apps/meusaldo`.
+- Nunca use `double` para dinheiro; use `Money` com centavos inteiros.
+- Escreva testes unitários no Core para cada regra financeira nova.
+- Interface é pt-BR, mobile-first e segue `docs/DESIGN_SYSTEM.md`.
+- Arquivos `*_screen.dart` orquestram a página e devem ficar com até 150 linhas; extraia seções visuais para widgets antes de ultrapassar esse limite.
+- Não misture a cor de marca com as cores semânticas de receita, despesa, alerta e transferência.
+- Não adicione dependências sem necessidade e justificativa.
