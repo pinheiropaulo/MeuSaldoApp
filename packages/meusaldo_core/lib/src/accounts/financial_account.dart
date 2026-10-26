@@ -57,6 +57,15 @@ class FinancialAccount {
     String? iconKey,
     DateTime? createdAt,
   }) {
+    final trimmedId = id.trim();
+    if (trimmedId.isEmpty) {
+      throw ArgumentError.value(
+        id,
+        'id',
+        'O identificador da conta não pode ser vazio.',
+      );
+    }
+
     final trimmedName = name.trim();
     if (trimmedName.isEmpty) {
       throw ArgumentError.value(
@@ -68,7 +77,7 @@ class FinancialAccount {
 
     final created = createdAt ?? DateTime.now();
     return FinancialAccount(
-      id: id,
+      id: trimmedId,
       name: trimmedName,
       type: type,
       initialBalance: initialBalance,
@@ -116,9 +125,27 @@ class FinancialAccount {
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
+    final effectiveId = id != null ? id.trim() : this.id;
+    if (effectiveId.isEmpty) {
+      throw ArgumentError.value(
+        id,
+        'id',
+        'O identificador da conta não pode ser vazio.',
+      );
+    }
+
+    final effectiveName = name != null ? name.trim() : this.name;
+    if (effectiveName.isEmpty) {
+      throw ArgumentError.value(
+        name,
+        'name',
+        'O nome da conta não pode ser vazio.',
+      );
+    }
+
     return FinancialAccount(
-      id: id ?? this.id,
-      name: name ?? this.name,
+      id: effectiveId,
+      name: effectiveName,
       type: type ?? this.type,
       initialBalance: initialBalance ?? this.initialBalance,
       currentBalance: currentBalance ?? this.currentBalance,

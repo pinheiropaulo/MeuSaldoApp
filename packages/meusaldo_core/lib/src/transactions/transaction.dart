@@ -154,15 +154,16 @@ class Transaction {
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return Transaction(
+    final effectiveType = type ?? this.type;
+    return Transaction.create(
       id: id ?? this.id,
-      type: type ?? this.type,
+      type: effectiveType,
       amount: amount ?? this.amount,
       date: date ?? this.date,
       description: description ?? this.description,
       status: status ?? this.status,
       accountId: accountId ?? this.accountId,
-      destinationAccountId: (type ?? this.type) == TransactionType.transfer
+      destinationAccountId: effectiveType == TransactionType.transfer
           ? (destinationAccountId ?? this.destinationAccountId)
           : null,
       categoryId: categoryId ?? this.categoryId,

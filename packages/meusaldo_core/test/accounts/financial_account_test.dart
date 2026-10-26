@@ -57,7 +57,7 @@ void main() {
       );
     });
 
-    test('copyWith preserva valores não alterados', () {
+    test('copyWith preserva valores não alterados e valida campos obrigatórios', () {
       final account = FinancialAccount.create(
         id: 'acc-1',
         name: 'Itaú',
@@ -70,6 +70,11 @@ void main() {
       expect(updated.name, equals('Itaú Unibanco'));
       expect(updated.isActive, isFalse);
       expect(updated.currentBalance.cents, equals(1000));
+
+      expect(() => account.copyWith(name: ''), throwsArgumentError);
+      expect(() => account.copyWith(name: '   '), throwsArgumentError);
+      expect(() => account.copyWith(id: ''), throwsArgumentError);
+      expect(() => account.copyWith(id: '   '), throwsArgumentError);
     });
   });
 }
