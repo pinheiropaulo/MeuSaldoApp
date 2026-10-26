@@ -1,0 +1,62 @@
+[
+  {
+    "nome": "Itaú Unibanco",
+    "tipo": "Tradicional / Privado",
+    "foco": "Varejo, investimentos e corporate banking"
+  },
+  {
+    "nome": "Banco do Brasil",
+    "tipo": "Tradicional / Público",
+    "foco": "Varejo, agronegócio e setor público"
+  },
+  {
+    "nome": "Caixa Econômica Federal",
+    "tipo": "Tradicional / Público",
+    "foco": "Habitação, programas sociais e FGTS"
+  },
+  {
+    "nome": "Bradesco",
+    "tipo": "Tradicional / Privado",
+    "foco": "Varejo, seguros e ampla rede de agências"
+  },
+  {
+    "nome": "Santander Brasil",
+    "tipo": "Tradicional / Privado",
+    "foco": "Varejo e financiamentos"
+  },
+  {
+    "nome": "BTG Pactual",
+    "tipo": "Tradicional / Privado",
+    "foco": "Investimentos e corporate banking"
+  },
+  {
+    "nome": "Nubank",
+    "tipo": "Digital",
+    "foco": "Cartões de crédito, conta digital e investimentos"
+  },
+  {
+    "nome": "Banco Inter",
+    "tipo": "Digital",
+    "foco": "Super app completo, investimentos e conta global"
+  },
+  {
+    "nome": "C6 Bank",
+    "tipo": "Digital",
+    "foco": "Cartões premium, conta internacional e investimentos"
+  },
+  {
+    "nome": "PagBank",
+    "tipo": "Digital",
+    "foco": "Meios de pagamento, serviços PJ e maquininhas"
+  },
+  {
+    "nome": "PicPay",
+    "tipo": "Digital",
+    "foco": "Carteira digital, pagamentos diários e marketplace"
+  },
+  {
+    "nome": "Neon",
+    "tipo": "Digital",
+    "foco": "Conta digital simplificada e foco em microempreendedores"
+  }
+]
