@@ -9,6 +9,7 @@ import 'package:meusaldo/features/home/presentation/widgets/home_balance_card.da
 import 'package:meusaldo/features/home/presentation/widgets/home_header.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_quick_actions.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_upcoming_alert.dart';
+import 'package:meusaldo/features/transactions/presentation/widgets/transaction_form_sheet.dart';
 
 Widget _buildTestApp({GoRouter? router}) {
   final effectiveRouter = router ??
@@ -113,7 +114,7 @@ void main() {
       expect(find.byTooltip('Ocultar saldo'), findsOneWidget);
     });
 
-    testWidgets('navega para a tela de lançamentos ao tocar nos botões de ação rápida',
+    testWidgets('abre o modal de formulário ao tocar no atalho rápido de despesa',
         (tester) async {
       await tester.pumpWidget(_buildTestApp());
       await tester.pumpAndSettle();
@@ -122,8 +123,9 @@ void main() {
       await tester.tap(find.text('Despesa'));
       await tester.pumpAndSettle();
 
-      // Confirma redirecionamento
-      expect(find.text('Tela Lançamentos'), findsOneWidget);
+      // Confirma abertura do modal de formulário
+      expect(find.byType(TransactionFormSheet), findsOneWidget);
+      expect(find.text('Novo lançamento'), findsOneWidget);
     });
 
     testWidgets('navega para a tela de contas ao tocar em Ver todas',

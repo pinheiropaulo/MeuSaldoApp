@@ -11,6 +11,8 @@ import 'package:meusaldo/features/home/presentation/widgets/home_header.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_quick_actions.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_upcoming_alert.dart';
 import 'package:meusaldo/features/transactions/presentation/state/transaction_providers.dart';
+import 'package:meusaldo/features/transactions/presentation/widgets/transaction_form_sheet.dart';
+import 'package:meusaldo_core/meusaldo_core.dart';
 
 /// Tela orquestradora inicial (Dashboard / Resumo do mês).
 class HomeScreen extends ConsumerWidget {
@@ -83,9 +85,18 @@ class HomeScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 22),
             HomeQuickActions(
-              onExpenseTap: () => context.go(AppRoutes.transactions),
-              onIncomeTap: () => context.go(AppRoutes.transactions),
-              onTransferTap: () => context.go(AppRoutes.transactions),
+              onExpenseTap: () => TransactionFormSheet.show(
+                context,
+                initialType: TransactionType.expense,
+              ),
+              onIncomeTap: () => TransactionFormSheet.show(
+                context,
+                initialType: TransactionType.income,
+              ),
+              onTransferTap: () => TransactionFormSheet.show(
+                context,
+                initialType: TransactionType.transfer,
+              ),
             ),
             const SizedBox(height: 22),
             HomeUpcomingAlert(
