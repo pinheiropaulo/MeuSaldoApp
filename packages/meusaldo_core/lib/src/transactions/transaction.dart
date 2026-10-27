@@ -131,6 +131,9 @@ class Transaction {
   /// Indica se a transação já está efetivada no saldo disponível.
   bool get isCompleted => status == TransactionStatus.completed;
 
+  /// Indica se a transação está pendente de efetivação.
+  bool get isPending => status == TransactionStatus.pending;
+
   /// Indica se a transação é uma despesa.
   bool get isExpense => type == TransactionType.expense;
 
