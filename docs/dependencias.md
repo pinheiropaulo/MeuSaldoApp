@@ -38,7 +38,7 @@ Este documento é o catálogo de dependências do MeuSaldo. Antes de adicionar u
 
 ### `google_fonts`
 
-- Uso: Roboto Flex e JetBrains Mono previstos no design system.
+- Uso: Roboto e JetBrains Mono previstos no design system.
 - Camada: `apps/meusaldo`.
 - Entrada: na implementação do tema. Antes de publicar, avaliar fontes empacotadas como assets para evitar dependência de rede em tempo de execução.
 

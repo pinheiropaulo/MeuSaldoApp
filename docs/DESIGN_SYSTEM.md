@@ -23,7 +23,7 @@ Interface mobile sóbria e acolhedora para uso frequente. Priorize legibilidade 
 
 ## Tipografia e números
 
-- Roboto Flex para textos da interface.
+- Roboto para textos da interface.
 - JetBrains Mono para valores financeiros, com números tabulares.
 - Prefixo `R$` com menor ênfase visual; negativos usam o sinal antes da moeda: `- R$ 150,00`.
 
