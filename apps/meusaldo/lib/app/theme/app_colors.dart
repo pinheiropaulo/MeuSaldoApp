@@ -8,6 +8,7 @@ abstract final class AppColors {
   static const Color background = Color(0xFF171417);
   static const Color surface = Color(0xFF242025);
   static const Color surfaceElevated = Color(0xFF2E2830);
+  static const Color surfaceVariant = Color(0xFF2E2830);
   static const Color outline = Color(0xFF3D353F);
 
   // Tipografia e Conteúdo
@@ -16,7 +17,9 @@ abstract final class AppColors {
 
   // Marca e Ações (CTA)
   static const Color brandPrimary = Color(0xFF6D1834);
+  static const Color primary = Color(0xFF6D1834);
   static const Color brandHighlight = Color(0xFFFFB1C1);
+  static const Color primaryHighlight = Color(0xFFFFB1C1);
 
   // Cores Semânticas Financeiras (Fixas e Imutáveis por tema)
   static const Color income = Color(0xFF22A06B);

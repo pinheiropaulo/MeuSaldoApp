@@ -28,6 +28,9 @@ class MoneyDisplay extends StatelessWidget {
   /// Cor customizada opcional para sobrescrever a cor padrão do tema.
   final Color? color;
 
+  /// Se deve utilizar a tipografia destacada de hero (32px).
+  final bool isHero;
+
   const MoneyDisplay({
     super.key,
     required this.money,
@@ -36,7 +39,7 @@ class MoneyDisplay extends StatelessWidget {
     this.transactionType,
     this.showPositiveSign = false,
     this.color,
-  });
+  }) : isHero = false;
 
   /// Construtor de conveniência para destaque de grandes valores (hero/dashboard).
   const MoneyDisplay.hero({
@@ -46,6 +49,7 @@ class MoneyDisplay extends StatelessWidget {
     this.showPositiveSign = false,
     this.color,
   }) : style = null,
+       isHero = true,
        showSymbol = true;
 
   @override
@@ -53,7 +57,10 @@ class MoneyDisplay extends StatelessWidget {
     final colors = Theme.of(context).extension<AppColorsExtension>();
     final resolvedColor = _resolveColor(colors);
 
-    final baseStyle = style ?? AppTypography.currencyRow(color: resolvedColor);
+    final baseStyle = style ??
+        (isHero
+            ? AppTypography.currencyHero(color: resolvedColor)
+            : AppTypography.currencyRow(color: resolvedColor));
     final effectiveStyle = baseStyle.copyWith(color: resolvedColor);
 
     final prefixStyle = effectiveStyle.copyWith(

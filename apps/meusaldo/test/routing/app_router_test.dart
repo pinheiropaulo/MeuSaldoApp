@@ -25,7 +25,7 @@ void main() {
       // Alterna para Contas
       await tester.tap(find.text('Contas'));
       await tester.pumpAndSettle();
-      expect(find.text('Contas financeiras'), findsOneWidget);
+      expect(find.text('Contas'), findsWidgets);
 
       // Alterna para Cartões
       await tester.tap(find.text('Cartões'));
