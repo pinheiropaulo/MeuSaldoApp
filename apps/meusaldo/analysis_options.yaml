@@ -13,6 +13,8 @@ analyzer:
   exclude:
     - build/**
     - android/**
+    - lib/**/*.g.dart
+    - web/**
 
 formatter:
   trailing_commas: preserve
