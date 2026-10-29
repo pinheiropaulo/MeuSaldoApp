@@ -1,14 +1,12 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:meusaldo/app/theme/app_colors.dart';
+import 'package:meusaldo/app/theme/runtime_environment.dart';
 
 /// Definições tipográficas do MeuSaldo — Roboto para UI e JetBrains Mono para valores monetários.
 abstract final class AppTypography {
   /// Indica se a execução atual ocorre no ambiente de testes do Flutter.
-  static bool get isRunningInTest =>
-      Platform.environment.containsKey('FLUTTER_TEST');
+  static bool get isRunningInTest => isRunningInFlutterTest;
 
   /// Gera o `TextTheme` base da aplicação usando Roboto.
   static TextTheme createTextTheme({bool? useGoogleFonts}) {
