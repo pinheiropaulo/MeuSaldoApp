@@ -35,15 +35,17 @@ lib/
   shared/                      # widgets e adaptadores reutilizáveis do app
 ```
 
-Implementações de repositório vivem no app, não no Core. O Core declara contratos; o app decide se os dados vêm de memória, banco local ou API.
+Implementações de repositório vivem no app, não no Core. O Core declara contratos; o app decide se os dados vêm de memória, banco local ou API. Supabase será a fonte remota planejada; Drift poderá assumir cache/offline depois de uma decisão documentada.
 
 ## Invariantes financeiros iniciais
 
 - `Money` usa centavos inteiros; operações não podem introduzir erro de arredondamento.
 - Receita aumenta saldo disponível; despesa reduz saldo disponível.
+- Apenas lançamentos `completed` alteram o saldo atual da conta. Lançamentos `pending` não alteram esse saldo.
+- O saldo previsto usa o mesmo cálculo incluindo lançamentos `completed` e `pending` aplicáveis ao período.
 - Uma transferência registra origem e destino de forma atômica e não muda o saldo consolidado.
 - Uma categoria deve ser compatível com o tipo de lançamento.
-- Editar ou excluir um lançamento deve recalcular os agregados afetados.
+- Editar, confirmar ou excluir um lançamento deve reverter seu efeito anterior e recalcular os agregados afetados em uma única operação persistida.
 - Lançamentos de cartão alteram a fatura correspondente; o pagamento altera a situação da fatura, não cria uma receita.
 
 ## Testes

@@ -2,7 +2,7 @@
 
 Aplicativo Android de controle financeiro pessoal, desenvolvido em Flutter. O produto ajuda a acompanhar contas, cartões, faturas, lançamentos, orçamentos e compromissos financeiros em português do Brasil.
 
-> Status: fundação do monorepo criada. O app e o Core ainda contêm os templates iniciais; as regras financeiras e as telas Flutter serão implementadas gradualmente.
+> Status: MVP Android em evolução. O Core financeiro, tema, navegação, telas de Início, Contas e Lançamentos, além da base local com Drift, já estão implementados. A próxima decisão técnica é a integração segura com Supabase.
 
 ## Arquitetura
 
@@ -17,7 +17,7 @@ MeuSaldoApp/
 └── docs/                     # Arquitetura, design e guias de desenvolvimento
 ```
 
-`meusaldo_core` não deve depender de Flutter, Android, banco de dados ou API. O app é responsável por UI, navegação e adaptadores de infraestrutura.
+`meusaldo_core` não deve depender de Flutter, Android, banco de dados ou API. O app é responsável por UI, navegação e adaptadores de infraestrutura. O Supabase será a fonte remota de dados; Drift permanece uma infraestrutura local cuja função (cache/offline) será definida antes da sincronização.
 
 ## Pré-requisitos
 
@@ -25,17 +25,11 @@ MeuSaldoApp/
 - Android SDK e um dispositivo/emulador Android configurado
 - Dart SDK, incluído na instalação do Flutter
 
-## Como executar o app Android
+## Como verificar o app Android
 
 ```powershell
 cd apps/meusaldo
 flutter pub get
-flutter run
-```
-
-Para verificar qualidade:
-
-```powershell
 flutter analyze
 flutter test
 ```
@@ -56,5 +50,7 @@ dart test
 - [Dependências e localização](docs/dependencias.md)
 - [Design system](docs/DESIGN_SYSTEM.md)
 - [Guia de desenvolvimento](docs/DEVELOPMENT.md)
+- [Organização do projeto](docs/organizacao-do-projeto.md)
+- [Plano de ação](docs/PLANO_DE_ACAO.md)
 
 Antes de modificar código, leia o contexto de IA e os documentos relevantes à mudança.

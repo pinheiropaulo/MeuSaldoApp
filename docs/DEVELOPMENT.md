@@ -9,7 +9,6 @@ cd apps/meusaldo
 flutter pub get
 flutter analyze
 flutter test
-flutter run
 ```
 
 ### Core
@@ -28,6 +27,19 @@ dart test
 3. Implemente o adaptador e a tela no app Flutter.
 4. Rode análise e testes no pacote afetado.
 5. Não altere arquivos gerados, `.dart_tool/`, `build/` ou arquivos de IDE.
+
+## Drift e `build_runner`
+
+Após alterar uma tabela, conversor ou anotação do Drift, gere novamente os arquivos:
+
+```powershell
+cd apps/meusaldo
+dart run build_runner build --delete-conflicting-outputs
+```
+
+- Nunca edite arquivos `*.g.dart` manualmente.
+- `*.g.dart` é código necessário à compilação e deve permanecer versionado quando o projeto depender dele.
+- Para ignorar avisos de lint apenas nesses arquivos, adicione `lib/**/*.g.dart` em `analyzer.exclude` de `apps/meusaldo/analysis_options.yaml`. Isso não substitui o versionamento e não impede que o código seja gerado.
 
 ## Dependências
 

@@ -9,5 +9,6 @@ Use também o documento específico da tarefa:
 - dependências, localização e momento de adoção: [`docs/dependencias.md`](docs/dependencias.md);
 - aparência e componentes: [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md);
 - comandos e verificações: [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
+- estado, decisões pendentes e próxima entrega: [`docs/PLANO_DE_ACAO.md`](docs/PLANO_DE_ACAO.md).
 
 Estas instruções são obrigatórias para todo o repositório.
