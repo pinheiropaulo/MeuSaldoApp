@@ -1,0 +1,9 @@
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: assets/images/logo_meusaldo.png
+  web:
+    generate: true
+    image_path: assets/images/logo_meusaldo.png
+    background_color: '#171417'
+    theme_color: '#6D1834'

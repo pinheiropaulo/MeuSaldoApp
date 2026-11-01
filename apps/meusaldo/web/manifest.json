@@ -1,11 +1,11 @@
 {
-    "name": "meusaldo",
-    "short_name": "meusaldo",
+    "name": "MeuSaldo",
+    "short_name": "MeuSaldo",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#171417",
+    "theme_color": "#6D1834",
+    "description": "Controle financeiro pessoal em um só lugar.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

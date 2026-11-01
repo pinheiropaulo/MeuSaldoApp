@@ -115,6 +115,13 @@ Localização significa idioma e formatos regionais, não geolocalização físi
 - Mantenha-os versionados quando forem necessários para compilar o projeto; exclua-os apenas da análise estática se os lints do projeto gerarem ruído.
 - Não confunda a exclusão do analyzer com `.gitignore`: excluir da análise não remove o arquivo do Git nem impede a compilação.
 
+### `flutter_launcher_icons`
+
+- Uso: gera os ícones Android e Web a partir da logo oficial em `assets/images/logo_meusaldo.png`.
+- Camada: ferramenta de desenvolvimento do app (`dev_dependency`); não integra o Core nem é usada em tempo de execução.
+- Configuração: `apps/meusaldo/flutter_launcher_icons.yaml`.
+- Execução: `dart run flutter_launcher_icons` dentro de `apps/meusaldo` após alterar a imagem-fonte.
+
 ## Decisões atuais de não adoção
 
 - Sem `get_it`: Riverpod cobre a injeção de dependências inicialmente.
