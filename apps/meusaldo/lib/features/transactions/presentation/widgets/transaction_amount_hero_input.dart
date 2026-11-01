@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meusaldo/app/theme/theme.dart';
+import 'package:meusaldo/shared/formatters/currency_input_formatter.dart';
 import 'package:meusaldo_core/meusaldo_core.dart';
 
 /// Campo hero central para digitação destacada do valor monetário da movimentação.
@@ -65,8 +66,10 @@ class TransactionAmountHeroInput extends StatelessWidget {
               IntrinsicWidth(
                 child: TextField(
                   controller: controller,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: const [
+                    CurrencyInputFormatter(),
+                  ],
                   textAlign: TextAlign.center,
                   style: AppTypography.currencyHero(
                     color: color,
@@ -75,6 +78,10 @@ class TransactionAmountHeroInput extends StatelessWidget {
                   ),
                   decoration: const InputDecoration(
                     border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
                     hintText: '0,00',
