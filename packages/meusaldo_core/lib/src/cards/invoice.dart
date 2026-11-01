@@ -30,6 +30,9 @@ class Invoice {
   /// Valor já amortizado ou pago nesta fatura.
   final Money paidAmount;
 
+  /// Data em que a fatura foi liquidada/paga.
+  final DateTime? paidDate;
+
   const Invoice({
     required this.id,
     required this.cardId,
@@ -40,6 +43,7 @@ class Invoice {
     required this.totalAmount,
     required this.status,
     this.paidAmount = const Money.zero(),
+    this.paidDate,
   });
 
   /// Construtor com validação de dados da fatura.
@@ -53,6 +57,7 @@ class Invoice {
     required Money totalAmount,
     InvoiceStatus status = InvoiceStatus.open,
     Money paidAmount = const Money.zero(),
+    DateTime? paidDate,
   }) {
     final trimmedId = id.trim();
     if (trimmedId.isEmpty) {
@@ -94,6 +99,7 @@ class Invoice {
       totalAmount: totalAmount,
       status: status,
       paidAmount: paidAmount,
+      paidDate: paidDate,
     );
   }
 
@@ -125,6 +131,7 @@ class Invoice {
     Money? totalAmount,
     InvoiceStatus? status,
     Money? paidAmount,
+    DateTime? paidDate,
   }) {
     return Invoice.create(
       id: id ?? this.id,
@@ -136,6 +143,7 @@ class Invoice {
       totalAmount: totalAmount ?? this.totalAmount,
       status: status ?? this.status,
       paidAmount: paidAmount ?? this.paidAmount,
+      paidDate: paidDate ?? this.paidDate,
     );
   }
 
@@ -152,7 +160,8 @@ class Invoice {
           dueDate == other.dueDate &&
           totalAmount == other.totalAmount &&
           status == other.status &&
-          paidAmount == other.paidAmount;
+          paidAmount == other.paidAmount &&
+          paidDate == other.paidDate;
 
   @override
   int get hashCode => Object.hash(
@@ -166,6 +175,7 @@ class Invoice {
         totalAmount,
         status,
         paidAmount,
+        paidDate,
       );
 
   @override
