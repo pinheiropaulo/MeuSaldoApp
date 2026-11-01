@@ -230,7 +230,24 @@ abstract final class DemoData {
   /// Faturas de exemplo para os cartões cadastrados.
   static List<Invoice> getInvoices() {
     final now = DateTime.now();
+    final prevMonth = now.month == 1 ? 12 : now.month - 1;
+    final prevYear = now.month == 1 ? now.year - 1 : now.year;
+    final nextMonth = now.month == 12 ? 1 : now.month + 1;
+    final nextYear = now.month == 12 ? now.year + 1 : now.year;
+
     return [
+      Invoice.create(
+        id: 'inv-nubank-prev',
+        cardId: 'card-nubank',
+        month: prevMonth,
+        year: prevYear,
+        closingDate: DateTime(prevYear, prevMonth, 3),
+        dueDate: DateTime(prevYear, prevMonth, 10),
+        totalAmount: const Money.fromCents(185000), // R$ 1.850,00
+        paidAmount: const Money.fromCents(185000),
+        status: InvoiceStatus.paid,
+        paidDate: DateTime(prevYear, prevMonth, 10),
+      ),
       Invoice.create(
         id: 'inv-nubank-current',
         cardId: 'card-nubank',
@@ -239,6 +256,16 @@ abstract final class DemoData {
         closingDate: DateTime(now.year, now.month, 3),
         dueDate: DateTime(now.year, now.month, 10),
         totalAmount: const Money.fromCents(234870), // R$ 2.348,70
+        status: InvoiceStatus.open,
+      ),
+      Invoice.create(
+        id: 'inv-nubank-next',
+        cardId: 'card-nubank',
+        month: nextMonth,
+        year: nextYear,
+        closingDate: DateTime(nextYear, nextMonth, 3),
+        dueDate: DateTime(nextYear, nextMonth, 10),
+        totalAmount: const Money.fromCents(85000), // R$ 850,00
         status: InvoiceStatus.open,
       ),
       Invoice.create(

@@ -156,3 +156,25 @@ final totalInstallmentRemainingProvider = Provider<Money>((ref) {
   }
   return total;
 });
+
+/// Provedor da lista de todas as faturas de um cartão específico.
+final cardInvoicesProvider =
+    FutureProvider.family<List<Invoice>, String>((ref, cardId) async {
+  final repo = ref.watch(creditCardRepositoryProvider);
+  final result = await repo.getInvoices(cardId);
+  return result.when(
+    onSuccess: (list) => list,
+    onFailure: (_) => const [],
+  );
+});
+
+/// Provedor de todos os lançamentos/despesas registrados para um cartão específico.
+final cardExpensesProvider =
+    FutureProvider.family<List<CardExpense>, String>((ref, cardId) async {
+  final repo = ref.watch(creditCardRepositoryProvider);
+  final result = await repo.getExpenses(cardId);
+  return result.when(
+    onSuccess: (list) => list,
+    onFailure: (_) => const [],
+  );
+});
