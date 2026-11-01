@@ -30,6 +30,9 @@ abstract final class AppRoutes {
   /// Aba Cartões de Crédito e Faturas.
   static const String cards = '/cards';
 
+  /// Tela de Detalhes da Fatura de Cartão de Crédito.
+  static const String cardInvoice = '/cards/:id/invoice';
+
   /// Aba Mais / Menu e Configurações.
   static const String more = '/more';
 }

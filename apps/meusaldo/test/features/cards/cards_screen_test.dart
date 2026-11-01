@@ -111,5 +111,16 @@ void main() {
       expect(find.text('Cadastrar Primeiro Cartão'), findsOneWidget);
       expect(find.text('Controle 100% Privado'), findsOneWidget);
     });
+
+    testWidgets('abre modal de cadastro ao tocar em Novo Cartão', (tester) async {
+      await tester.pumpWidget(_buildTestApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Novo Cartão'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Cadastre seu cartão para controlar limites, fechamento de faturas e compras parceladas.'), findsOneWidget);
+      expect(find.text('Salvar Cartão'), findsOneWidget);
+    });
   });
 }

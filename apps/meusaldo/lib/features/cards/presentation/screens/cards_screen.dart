@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:meusaldo/app/theme/theme.dart';
+import 'package:meusaldo/features/cards/presentation/screens/invoice_details_screen.dart';
 import 'package:meusaldo/features/cards/presentation/state/card_providers.dart';
+import 'package:meusaldo/features/cards/presentation/widgets/card_form_sheet.dart';
 import 'package:meusaldo/features/cards/presentation/widgets/card_installments_section.dart';
 import 'package:meusaldo/features/cards/presentation/widgets/card_invoice_hero_card.dart';
 import 'package:meusaldo/features/cards/presentation/widgets/cards_carousel_section.dart';
 import 'package:meusaldo/features/cards/presentation/widgets/cards_empty_state.dart';
+import 'package:meusaldo/features/cards/presentation/widgets/payment/invoice_payment_sheet.dart';
 
 /// Tela orquestradora de cartões de crédito e gestão de faturas.
 class CardsScreen extends ConsumerWidget {
@@ -46,7 +50,7 @@ class CardsScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onPressed: () => _showAddCardNotice(context),
+              onPressed: () => CardFormSheet.show(context),
               icon: const Icon(Icons.add, size: 16, color: AppColors.primaryHighlight),
               label: const Text(
                 'Novo Cartão',
@@ -64,7 +68,7 @@ class CardsScreen extends ConsumerWidget {
         },
         child: cards.isEmpty && !cardsAsync.isLoading
             ? CardsEmptyState(
-                onAddCardPressed: () => _showAddCardNotice(context),
+                onAddCardPressed: () => CardFormSheet.show(context),
               )
             : ListView(
                 padding: const EdgeInsets.symmetric(vertical: 12),
@@ -82,20 +86,28 @@ class CardsScreen extends ConsumerWidget {
                     child: CardInvoiceHeroCard(
                       invoice: invoice,
                       onViewInvoiceTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Detalhe completo da fatura em breve.'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
+                        final card = selectedCard ?? (cards.isNotEmpty ? cards.first : null);
+                        if (card != null) {
+                          try {
+                            context.push('/cards/${card.id}/invoice');
+                          } catch (_) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => InvoiceDetailsScreen(cardId: card.id),
+                              ),
+                            );
+                          }
+                        }
                       },
                       onPayInvoiceTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Fluxo de pagamento de fatura em breve.'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
+                        final card = selectedCard ?? (cards.isNotEmpty ? cards.first : null);
+                        if (invoice != null && card != null) {
+                          InvoicePaymentSheet.show(
+                            context,
+                            invoice: invoice,
+                            card: card,
+                          );
+                        }
                       },
                     ),
                   ),
@@ -118,15 +130,6 @@ class CardsScreen extends ConsumerWidget {
                   const SizedBox(height: 24),
                 ],
               ),
-      ),
-    );
-  }
-
-  void _showAddCardNotice(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Formulário de cadastro de novo cartão na próxima etapa.'),
-        duration: Duration(seconds: 2),
       ),
     );
   }

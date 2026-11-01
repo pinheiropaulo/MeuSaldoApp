@@ -10,6 +10,7 @@ import 'package:meusaldo/features/auth/presentation/screens/login_screen.dart';
 import 'package:meusaldo/features/auth/presentation/screens/splash_screen.dart';
 import 'package:meusaldo/features/auth/presentation/state/auth_providers.dart';
 import 'package:meusaldo/features/cards/presentation/screens/cards_screen.dart';
+import 'package:meusaldo/features/cards/presentation/screens/invoice_details_screen.dart';
 import 'package:meusaldo/features/home/presentation/screens/home_screen.dart';
 import 'package:meusaldo/features/more/presentation/screens/more_screen.dart';
 import 'package:meusaldo/features/transactions/presentation/screens/bill_schedule_screen.dart';
@@ -96,6 +97,13 @@ GoRouter createRouter({
         builder: (context, state) {
           final accountId = state.pathParameters['id']!;
           return EditAccountScreen(accountId: accountId);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.cardInvoice,
+        builder: (context, state) {
+          final cardId = state.pathParameters['id']!;
+          return InvoiceDetailsScreen(cardId: cardId);
         },
       ),
       StatefulShellRoute.indexedStack(
