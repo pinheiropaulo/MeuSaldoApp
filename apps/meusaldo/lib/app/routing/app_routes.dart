@@ -21,6 +21,12 @@ abstract final class AppRoutes {
   /// Aba Contas Financeiras.
   static const String accounts = '/accounts';
 
+  /// Tela de Detalhes e Extrato Individual da Conta Bancária.
+  static const String accountDetails = '/accounts/:id';
+
+  /// Tela de Edição Dedicada de Conta Financeira.
+  static const String editAccount = '/accounts/:id/edit';
+
   /// Aba Cartões de Crédito e Faturas.
   static const String cards = '/cards';
 

@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meusaldo/app/routing/app_routes.dart';
 import 'package:meusaldo/app/routing/scaffold_shell.dart';
+import 'package:meusaldo/features/accounts/presentation/screens/account_details_screen.dart';
 import 'package:meusaldo/features/accounts/presentation/screens/accounts_screen.dart';
+import 'package:meusaldo/features/accounts/presentation/screens/edit_account_screen.dart';
 import 'package:meusaldo/features/auth/presentation/screens/login_screen.dart';
 import 'package:meusaldo/features/auth/presentation/screens/splash_screen.dart';
 import 'package:meusaldo/features/auth/presentation/state/auth_providers.dart';
@@ -81,6 +83,20 @@ GoRouter createRouter({
       GoRoute(
         path: AppRoutes.recurring,
         builder: (context, state) => const RecurringTransactionsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.accountDetails,
+        builder: (context, state) {
+          final accountId = state.pathParameters['id']!;
+          return AccountDetailsScreen(accountId: accountId);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.editAccount,
+        builder: (context, state) {
+          final accountId = state.pathParameters['id']!;
+          return EditAccountScreen(accountId: accountId);
+        },
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

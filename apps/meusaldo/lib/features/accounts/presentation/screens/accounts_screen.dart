@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:meusaldo/app/theme/theme.dart';
+import 'package:meusaldo/features/accounts/presentation/screens/account_details_screen.dart';
 import 'package:meusaldo/features/accounts/presentation/state/account_providers.dart';
 import 'package:meusaldo/features/accounts/presentation/widgets/account_card_item.dart';
 import 'package:meusaldo/features/accounts/presentation/widgets/account_form_sheet.dart';
@@ -83,7 +85,17 @@ class AccountsScreen extends ConsumerWidget {
                 ...accounts.map(
                   (acc) => AccountCardItem(
                     account: acc,
-                    onTap: () => AccountFormSheet.show(context, account: acc),
+                    onTap: () {
+                      try {
+                        context.push('/accounts/${acc.id}');
+                      } catch (_) {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => AccountDetailsScreen(accountId: acc.id),
+                          ),
+                        );
+                      }
+                    },
                   ),
                 ),
                 const SizedBox(height: 8),

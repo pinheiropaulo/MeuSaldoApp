@@ -96,7 +96,7 @@ void main() {
       expect(find.byType(AccountCardItem), findsOneWidget);
     });
 
-    testWidgets('abre edição de conta ao tocar no item', (tester) async {
+    testWidgets('abre detalhes e edição de conta ao tocar no item', (tester) async {
       final account = FinancialAccount.create(
         id: 'acc_nubank',
         name: 'Nubank Teste',
@@ -113,11 +113,27 @@ void main() {
       await tester.tap(find.text('Nubank Teste'));
       await tester.pumpAndSettle();
 
-      // Confirma que abriu em modo de edição
+      // Confirma que abriu a tela de detalhes
+      expect(find.text('Conta Bancária'), findsOneWidget);
+      expect(find.text('Saldo disponível'), findsOneWidget);
+      expect(find.text('+ Movimentação'), findsOneWidget);
+      expect(find.text('Transferir'), findsOneWidget);
+
+      // Toca no botão de editar da AppBar
+      await tester.tap(find.byTooltip('Editar conta'));
+      await tester.pumpAndSettle();
+
+      // Confirma que abriu a tela de edição dedicada
       expect(find.text('Editar conta'), findsOneWidget);
-      expect(find.text('Salvar alterações'), findsOneWidget);
       expect(find.text('Somente leitura'), findsOneWidget);
+      expect(find.text('Conta corrente'), findsOneWidget);
+
+      await tester.drag(find.byType(Form), const Offset(0, -600));
+      await tester.pumpAndSettle();
+
       expect(find.text('Zona de exclusão'), findsOneWidget);
+      expect(find.text('Salvar alterações'), findsOneWidget);
+      expect(find.text('Cancelar'), findsOneWidget);
     });
   });
 }

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:meusaldo/app/routing/app_routes.dart';
 import 'package:meusaldo/app/theme/theme.dart';
 import 'package:meusaldo/features/accounts/presentation/state/account_providers.dart';
+import 'package:meusaldo/features/cards/presentation/state/card_providers.dart';
 import 'package:meusaldo/features/categories/presentation/state/category_providers.dart';
 import 'package:meusaldo/features/transactions/presentation/state/transaction_filter_providers.dart';
 import 'package:meusaldo/features/transactions/presentation/state/transaction_providers.dart';
@@ -23,6 +26,7 @@ class TransactionsScreen extends ConsumerWidget {
     final selectedType = ref.watch(selectedTypeFilterProvider);
     final groupedTransactions = ref.watch(groupedTransactionsProvider);
     final accounts = ref.watch(accountsListProvider).value ?? const [];
+    final cards = ref.watch(cardsListProvider).value ?? const [];
     final categories = ref.watch(categoriesListProvider).value ?? const [];
 
     return Scaffold(
@@ -36,6 +40,18 @@ class TransactionsScreen extends ConsumerWidget {
           ],
         ),
         actions: [
+          IconButton(
+            key: const Key('transactions_recurring_button'),
+            icon: const Icon(Icons.repeat, color: AppColors.textPrimary),
+            tooltip: 'Recorrências',
+            onPressed: () => context.push(AppRoutes.recurring),
+          ),
+          IconButton(
+            key: const Key('transactions_agenda_button'),
+            icon: const Icon(Icons.calendar_month_outlined, color: AppColors.textPrimary),
+            tooltip: 'Agenda de Contas',
+            onPressed: () => context.push(AppRoutes.schedule),
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: AppButton(
@@ -94,6 +110,7 @@ class TransactionsScreen extends ConsumerWidget {
                       transactions: entry.value,
                       accounts: accounts,
                       categories: categories,
+                      cards: cards,
                     ),
                     const SizedBox(height: 8),
                   ],
