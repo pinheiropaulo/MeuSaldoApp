@@ -15,11 +15,15 @@ class TransactionGroupCard extends StatelessWidget {
   /// Lista de categorias para resolução de nomes.
   final List<Category> categories;
 
+  /// Lista de cartões de crédito para resolução de nomes (opcional).
+  final List<CreditCard> cards;
+
   const TransactionGroupCard({
     super.key,
     required this.transactions,
     required this.accounts,
     required this.categories,
+    this.cards = const [],
   });
 
   @override
@@ -47,10 +51,15 @@ class TransactionGroupCard extends StatelessWidget {
                 .where((c) => c.id == tx.categoryId)
                 .map((c) => c.name)
                 .firstOrNull;
-            final accountName = accounts
-                .where((a) => a.id == tx.accountId)
-                .map((a) => a.name)
-                .firstOrNull;
+            final cardName = tx.isCardExpense
+                ? cards.where((c) => c.id == tx.cardId).map((c) => c.name).firstOrNull
+                : null;
+            final accountName = tx.isCardExpense
+                ? (cardName != null ? 'Cartão $cardName' : 'Cartão de crédito')
+                : accounts
+                    .where((a) => a.id == tx.accountId)
+                    .map((a) => a.name)
+                    .firstOrNull;
             final destAccountName = tx.destinationAccountId != null
                 ? accounts
                     .where((a) => a.id == tx.destinationAccountId)

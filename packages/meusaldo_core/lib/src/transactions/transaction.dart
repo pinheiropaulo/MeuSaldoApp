@@ -31,6 +31,12 @@ class Transaction {
   /// Identificador da categoria financeira associada.
   final String? categoryId;
 
+  /// Identificador do cartão de crédito (opcional, para despesas no cartão).
+  final String? cardId;
+
+  /// Quantidade total de parcelas (opcional, para despesas no cartão).
+  final int? installments;
+
   /// Observações ou anotações adicionais.
   final String? notes;
 
@@ -50,6 +56,8 @@ class Transaction {
     required this.accountId,
     this.destinationAccountId,
     this.categoryId,
+    this.cardId,
+    this.installments,
     this.notes,
     required this.createdAt,
     this.updatedAt,
@@ -66,6 +74,8 @@ class Transaction {
     required String accountId,
     String? destinationAccountId,
     String? categoryId,
+    String? cardId,
+    int? installments,
     String? notes,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -122,6 +132,8 @@ class Transaction {
           ? destinationAccountId?.trim()
           : null,
       categoryId: categoryId?.trim(),
+      cardId: cardId?.trim(),
+      installments: installments,
       notes: notes?.trim(),
       createdAt: createdAt ?? DateTime.now(),
       updatedAt: updatedAt,
@@ -143,6 +155,9 @@ class Transaction {
   /// Indica se a transação é uma transferência.
   bool get isTransfer => type == TransactionType.transfer;
 
+  /// Indica se o lançamento foi realizado com cartão de crédito.
+  bool get isCardExpense => cardId != null && cardId!.isNotEmpty;
+
   Transaction copyWith({
     String? id,
     TransactionType? type,
@@ -153,6 +168,8 @@ class Transaction {
     String? accountId,
     String? destinationAccountId,
     String? categoryId,
+    String? cardId,
+    int? installments,
     String? notes,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -170,6 +187,8 @@ class Transaction {
           ? (destinationAccountId ?? this.destinationAccountId)
           : null,
       categoryId: categoryId ?? this.categoryId,
+      cardId: cardId ?? this.cardId,
+      installments: installments ?? this.installments,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -189,7 +208,9 @@ class Transaction {
           status == other.status &&
           accountId == other.accountId &&
           destinationAccountId == other.destinationAccountId &&
-          categoryId == other.categoryId;
+          categoryId == other.categoryId &&
+          cardId == other.cardId &&
+          installments == other.installments;
 
   @override
   int get hashCode => Object.hash(
@@ -203,9 +224,11 @@ class Transaction {
     accountId,
     destinationAccountId,
     categoryId,
+    cardId,
+    installments,
   );
 
   @override
   String toString() =>
-      'Transaction(id: $id, type: ${type.name}, amount: $amount, status: ${status.name})';
+      'Transaction(id: $id, type: ${type.name}, amount: $amount, status: ${status.name}, cardId: $cardId)';
 }

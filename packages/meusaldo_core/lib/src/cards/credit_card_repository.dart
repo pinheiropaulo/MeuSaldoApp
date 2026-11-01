@@ -18,6 +18,9 @@ abstract interface class CreditCardRepository {
   /// Obtém as compras parceladas ainda ativas para o cartão informado.
   Future<Result<List<CardExpense>, Failure>> getActiveInstallments(String cardId);
 
+  /// Registra uma nova despesa no cartão de crédito.
+  Future<Result<CardExpense, Failure>> addExpense(CardExpense expense);
+
   /// Registra um novo cartão de crédito.
   Future<Result<CreditCard, Failure>> create(CreditCard card);
 

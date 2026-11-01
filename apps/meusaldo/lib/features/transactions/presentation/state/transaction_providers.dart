@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meusaldo/features/accounts/presentation/state/account_providers.dart';
+import 'package:meusaldo/features/cards/presentation/state/card_providers.dart';
 import 'package:meusaldo/features/transactions/data/in_memory_transaction_repository.dart';
 import 'package:meusaldo_core/meusaldo_core.dart';
 
@@ -33,8 +34,28 @@ class TransactionsListNotifier extends AsyncNotifier<List<Transaction>> {
       return saveResult;
     }
 
-    // Se efetivada, reflete no saldo da conta
-    if (tx.isCompleted) {
+    // Se for despesa no cartão de crédito, reflete na fatura e no limite do cartão
+    if (tx.isCardExpense) {
+      final cardRepo = ref.read(creditCardRepositoryProvider);
+      final installmentsCount = tx.installments ?? 1;
+      final installmentAmount = installmentsCount > 1
+          ? Money.fromCents((tx.amount.cents / installmentsCount).round())
+          : tx.amount;
+
+      final cardExpense = CardExpense.create(
+        id: 'exp_${DateTime.now().millisecondsSinceEpoch}',
+        cardId: tx.cardId!,
+        description: tx.description,
+        amount: installmentAmount,
+        date: tx.date,
+        currentInstallment: installmentsCount > 1 ? 1 : null,
+        totalInstallments: installmentsCount > 1 ? installmentsCount : null,
+        categoryId: tx.categoryId,
+      );
+      await cardRepo.addExpense(cardExpense);
+      ref.invalidate(cardsListProvider);
+    } else if (tx.isCompleted) {
+      // Se efetivada em conta bancária, reflete no saldo da conta
       const calculator = BalanceCalculator();
       final accountResult = await accountRepo.getAccountById(tx.accountId);
       if (accountResult.isSuccess) {
@@ -103,6 +124,75 @@ class TransactionsListNotifier extends AsyncNotifier<List<Transaction>> {
     ref.invalidateSelf();
 
     return transferResult;
+  }
+
+  /// Atualiza os dados de um lançamento existente e recalcula os saldos das contas impactadas.
+  Future<Result<Transaction, Failure>> updateTransaction(Transaction updatedTransaction) async {
+    final txRepo = ref.read(transactionRepositoryProvider);
+    final accountRepo = ref.read(accountRepositoryProvider);
+
+    final oldTxResult = await txRepo.getTransactionById(updatedTransaction.id);
+    if (oldTxResult.isFailure) {
+      return oldTxResult;
+    }
+
+    final oldTx = oldTxResult.valueOrNull!;
+    const calculator = BalanceCalculator();
+
+    // 1. Reverte o efeito da transação antiga se ela estava completada
+    if (oldTx.isCompleted) {
+      final oldAccountResult = await accountRepo.getAccountById(oldTx.accountId);
+      if (oldAccountResult.isSuccess) {
+        final reverted = calculator.revertTransaction(
+          account: oldAccountResult.valueOrNull!,
+          transaction: oldTx,
+        );
+        await accountRepo.updateAccount(reverted);
+      }
+
+      if (oldTx.isTransfer && oldTx.destinationAccountId != null) {
+        final oldDestResult = await accountRepo.getAccountById(oldTx.destinationAccountId!);
+        if (oldDestResult.isSuccess) {
+          final revertedDest = calculator.revertTransaction(
+            account: oldDestResult.valueOrNull!,
+            transaction: oldTx,
+          );
+          await accountRepo.updateAccount(revertedDest);
+        }
+      }
+    }
+
+    // 2. Aplica o efeito da nova transação se ela estiver completada
+    if (updatedTransaction.isCompleted) {
+      final newAccountResult = await accountRepo.getAccountById(updatedTransaction.accountId);
+      if (newAccountResult.isSuccess) {
+        final applied = calculator.applyTransaction(
+          account: newAccountResult.valueOrNull!,
+          transaction: updatedTransaction,
+        );
+        await accountRepo.updateAccount(applied);
+      }
+
+      if (updatedTransaction.isTransfer && updatedTransaction.destinationAccountId != null) {
+        final newDestResult = await accountRepo.getAccountById(updatedTransaction.destinationAccountId!);
+        if (newDestResult.isSuccess) {
+          final appliedDest = calculator.applyTransaction(
+            account: newDestResult.valueOrNull!,
+            transaction: updatedTransaction,
+          );
+          await accountRepo.updateAccount(appliedDest);
+        }
+      }
+    }
+
+    ref.invalidate(accountsListProvider);
+
+    // 3. Salva a transação atualizada no repositório
+    final result = await txRepo.updateTransaction(updatedTransaction);
+    if (result.isSuccess) {
+      ref.invalidateSelf();
+    }
+    return result;
   }
 
   /// Exclui um lançamento e reverte o seu impacto no saldo da conta.

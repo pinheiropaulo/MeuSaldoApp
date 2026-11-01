@@ -68,6 +68,27 @@ class InMemoryCreditCardRepository implements CreditCardRepository {
   }
 
   @override
+  Future<Result<CardExpense, Failure>> addExpense(CardExpense expense) async {
+    _expenses.add(expense);
+
+    // Atualiza limite utilizado do cartão
+    final card = _cards[expense.cardId];
+    if (card != null) {
+      final updatedUsedLimit = card.usedLimit + expense.amount;
+      _cards[expense.cardId] = card.copyWith(usedLimit: updatedUsedLimit);
+    }
+
+    // Atualiza fatura atual
+    final invoice = _invoices[expense.cardId];
+    if (invoice != null) {
+      final updatedTotal = invoice.totalAmount + expense.amount;
+      _invoices[expense.cardId] = invoice.copyWith(totalAmount: updatedTotal);
+    }
+
+    return Result.success(expense);
+  }
+
+  @override
   Future<Result<CreditCard, Failure>> create(CreditCard card) async {
     if (_cards.containsKey(card.id)) {
       return Result.failure(

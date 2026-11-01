@@ -156,12 +156,43 @@ abstract final class DemoData {
         destinationAccountId: 'acc-itau',
       ),
       Transaction.create(
+        id: 'tx-enel-vencida',
+        type: TransactionType.expense,
+        amount: const Money.fromCents(13990), // R$ 139,90
+        date: now.subtract(const Duration(days: 8)),
+        description: 'Enel Energia Elétrica',
+        status: TransactionStatus.pending,
+        accountId: 'acc-nubank',
+        categoryId: 'cat-moradia',
+        notes: 'Boleto vencido aguardando pagamento',
+      ),
+      Transaction.create(
         id: 'tx-condominio-futuro',
         type: TransactionType.expense,
-        amount: const Money.fromCents(65000), // R$ 650,00
-        date: DateTime(now.year, now.month, 28),
+        amount: const Money.fromCents(45000), // R$ 450,00
+        date: now.add(const Duration(days: 3)),
         description: 'Condomínio Residencial',
         status: TransactionStatus.pending,
+        accountId: 'acc-nubank',
+        categoryId: 'cat-moradia',
+      ),
+      Transaction.create(
+        id: 'tx-smartfit',
+        type: TransactionType.expense,
+        amount: const Money.fromCents(12990), // R$ 129,90
+        date: now.add(const Duration(days: 3)),
+        description: 'Academia SmartFit',
+        status: TransactionStatus.pending,
+        accountId: 'acc-nubank',
+        categoryId: 'cat-lazer',
+      ),
+      Transaction.create(
+        id: 'tx-aluguel-pago',
+        type: TransactionType.expense,
+        amount: const Money.fromCents(180000), // R$ 1.800,00
+        date: DateTime(now.year, now.month, 1),
+        description: 'Aluguel do Apartamento',
+        status: TransactionStatus.completed,
         accountId: 'acc-nubank',
         categoryId: 'cat-moradia',
       ),
@@ -256,6 +287,78 @@ abstract final class DemoData {
         currentInstallment: 3,
         totalInstallments: 6,
         categoryId: 'cat-lazer',
+      ),
+    ];
+  }
+
+  /// Lançamentos recorrentes e assinaturas pré-carregadas.
+  static List<RecurringTransaction> getRecurringTransactions() {
+    return [
+      RecurringTransaction.create(
+        id: 'rec-netflix',
+        description: 'Netflix Brasil',
+        amount: const Money.fromCents(5590), // R$ 55,90
+        type: TransactionType.expense,
+        category: RecurrenceCategory.subscription,
+        billingDay: 20,
+        billingDayDescription: 'Todo dia 20 • Cartão Nubank',
+        paymentMethod: 'Cartão Nubank',
+        iconKey: 'movie',
+      ),
+      RecurringTransaction.create(
+        id: 'rec-spotify',
+        description: 'Spotify Premium',
+        amount: const Money.fromCents(2190), // R$ 21,90
+        type: TransactionType.expense,
+        category: RecurrenceCategory.subscription,
+        billingDay: 12,
+        billingDayDescription: 'Todo dia 12 • Cartão Nubank',
+        paymentMethod: 'Cartão Nubank',
+        iconKey: 'headphones',
+      ),
+      RecurringTransaction.create(
+        id: 'rec-smartfit',
+        description: 'SmartFit Plano Black',
+        amount: const Money.fromCents(12990), // R$ 129,90
+        type: TransactionType.expense,
+        category: RecurrenceCategory.subscription,
+        billingDay: 5,
+        billingDayDescription: 'Todo dia 05 • Débito NuConta',
+        paymentMethod: 'Débito NuConta',
+        iconKey: 'fitness_center',
+      ),
+      RecurringTransaction.create(
+        id: 'rec-aluguel',
+        description: 'Aluguel do Apartamento',
+        amount: const Money.fromCents(180000), // R$ 1.800,00
+        type: TransactionType.expense,
+        category: RecurrenceCategory.fixedExpense,
+        billingDay: 10,
+        billingDayDescription: 'Vence todo dia 10 • NuConta',
+        paymentMethod: 'NuConta',
+        iconKey: 'key',
+      ),
+      RecurringTransaction.create(
+        id: 'rec-fibra',
+        description: 'Vivo Fibra 500MB',
+        amount: const Money.fromCents(13990), // R$ 139,90
+        type: TransactionType.expense,
+        category: RecurrenceCategory.fixedExpense,
+        billingDay: 15,
+        billingDayDescription: 'Vence todo dia 15 • Boleto',
+        paymentMethod: 'Boleto',
+        iconKey: 'wifi',
+      ),
+      RecurringTransaction.create(
+        id: 'rec-salario',
+        description: 'Salário Mensal CLT',
+        amount: const Money.fromCents(650000), // R$ 6.500,00
+        type: TransactionType.income,
+        category: RecurrenceCategory.income,
+        billingDay: 5,
+        billingDayDescription: 'Todo 5º dia útil • NuConta',
+        paymentMethod: 'NuConta',
+        iconKey: 'account_balance_wallet',
       ),
     ];
   }

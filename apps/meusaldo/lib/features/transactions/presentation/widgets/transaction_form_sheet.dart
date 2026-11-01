@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meusaldo/app/theme/theme.dart';
 import 'package:meusaldo/features/accounts/presentation/state/account_providers.dart';
+import 'package:meusaldo/features/cards/presentation/state/card_providers.dart';
 import 'package:meusaldo/features/categories/presentation/state/category_providers.dart';
 import 'package:meusaldo/features/transactions/presentation/state/transaction_providers.dart';
 import 'package:meusaldo/features/transactions/presentation/widgets/transaction_amount_hero_input.dart';
@@ -11,24 +12,35 @@ import 'package:meusaldo/shared/widgets/app_bottom_sheet.dart';
 import 'package:meusaldo/shared/widgets/app_button.dart';
 import 'package:meusaldo_core/meusaldo_core.dart';
 
+/// Forma de pagamento da despesa (débito em conta ou cartão de crédito).
+enum ExpensePaymentMethod { account, creditCard }
+
 /// Modal bottom sheet para criação de despesa, receita ou transferência.
 class TransactionFormSheet extends ConsumerStatefulWidget {
   /// Tipo de movimentação inicial (padrão é despesa).
   final TransactionType initialType;
 
+  /// Conta financeira pré-selecionada (opcional).
+  final String? initialAccountId;
+
   const TransactionFormSheet({
     super.key,
     this.initialType = TransactionType.expense,
+    this.initialAccountId,
   });
 
   /// Exibe o formulário de novo lançamento.
   static Future<bool?> show(
     BuildContext context, {
     TransactionType initialType = TransactionType.expense,
+    String? initialAccountId,
   }) {
     return showAppBottomSheet<bool>(
       context: context,
-      builder: (_) => TransactionFormSheet(initialType: initialType),
+      builder: (_) => TransactionFormSheet(
+        initialType: initialType,
+        initialAccountId: initialAccountId,
+      ),
     );
   }
 
@@ -47,6 +59,9 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
   String? _selectedAccountId;
   String? _selectedDestinationAccountId;
   String? _selectedCategoryId;
+  String? _selectedCardId;
+  ExpensePaymentMethod _paymentMethod = ExpensePaymentMethod.account;
+  int _selectedInstallments = 1;
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -55,6 +70,7 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
   void initState() {
     super.initState();
     _selectedType = widget.initialType;
+    _selectedAccountId = widget.initialAccountId;
     _amountController = TextEditingController();
     _descController = TextEditingController();
     _notesController = TextEditingController();
@@ -81,9 +97,19 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
       return;
     }
 
-    if (_selectedAccountId == null) {
-      setState(() => _errorMessage = 'Selecione uma conta financeira.');
-      return;
+    final isCard = _selectedType == TransactionType.expense &&
+        _paymentMethod == ExpensePaymentMethod.creditCard;
+
+    if (isCard) {
+      if (_selectedCardId == null) {
+        setState(() => _errorMessage = 'Selecione um cartão de crédito.');
+        return;
+      }
+    } else {
+      if (_selectedAccountId == null) {
+        setState(() => _errorMessage = 'Selecione uma conta financeira.');
+        return;
+      }
     }
 
     if (_selectedType == TransactionType.transfer) {
@@ -130,13 +156,20 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
         });
       }
     } else {
+      final accounts = ref.read(accountsListProvider).value ?? const [];
+      final effectiveAccountId = isCard
+          ? (_selectedAccountId ?? (accounts.isNotEmpty ? accounts.first.id : 'acc-default'))
+          : _selectedAccountId!;
+
       final newTx = Transaction.create(
         id: 'tx_${DateTime.now().millisecondsSinceEpoch}',
         description: desc,
         amount: amount,
         date: _selectedDate,
         type: _selectedType,
-        accountId: _selectedAccountId!,
+        accountId: effectiveAccountId,
+        cardId: isCard ? _selectedCardId : null,
+        installments: isCard ? _selectedInstallments : null,
         categoryId: _selectedCategoryId,
         notes: _notesController.text.trim().isNotEmpty
             ? _notesController.text.trim()
@@ -160,7 +193,13 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
   @override
   Widget build(BuildContext context) {
     final accounts = ref.watch(accountsListProvider).value ?? const [];
+    final cards = ref.watch(cardsListProvider).value ?? const [];
     final categories = ref.watch(categoriesListProvider).value ?? const [];
+
+    // Se o cartão padrão ainda não foi selecionado, pega o primeiro
+    if (_selectedCardId == null && cards.isNotEmpty) {
+      _selectedCardId = cards.first.id;
+    }
 
     // Filtra categorias compatíveis com o tipo selecionado
     final filteredCategories = categories.where((c) {
@@ -301,21 +340,95 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
                     setState(() => _selectedDestinationAccountId = id),
               ),
             ] else ...[
-              Text(
-                _selectedType == TransactionType.expense
-                    ? 'Conta de débito *'
-                    : 'Conta de crédito *',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-              const SizedBox(height: 6),
-              _buildAccountDropdown(
-                value: _selectedAccountId,
-                accounts: accounts,
-                onChanged: (id) => setState(() => _selectedAccountId = id),
-              ),
-              const SizedBox(height: 14),
+              if (_selectedType == TransactionType.expense) ...[
+                Text(
+                  'Forma de pagamento *',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceElevated,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.outline),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _buildPaymentMethodOption(
+                          label: 'Conta Bancária',
+                          icon: Icons.account_balance,
+                          isSelected: _paymentMethod == ExpensePaymentMethod.account,
+                          onTap: () => setState(() => _paymentMethod = ExpensePaymentMethod.account),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: _buildPaymentMethodOption(
+                          label: 'Cartão de Crédito',
+                          icon: Icons.credit_card,
+                          isSelected: _paymentMethod == ExpensePaymentMethod.creditCard,
+                          onTap: () => setState(() {
+                            _paymentMethod = ExpensePaymentMethod.creditCard;
+                            if (_selectedCardId == null && cards.isNotEmpty) {
+                              _selectedCardId = cards.first.id;
+                            }
+                          }),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+              ],
+              if (_selectedType == TransactionType.expense &&
+                  _paymentMethod == ExpensePaymentMethod.creditCard) ...[
+                Text(
+                  'Cartão de crédito *',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                const SizedBox(height: 6),
+                _buildCardDropdown(
+                  value: _selectedCardId,
+                  cards: cards,
+                  onChanged: (id) => setState(() => _selectedCardId = id),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  'Parcelamento',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                const SizedBox(height: 6),
+                _buildInstallmentsDropdown(
+                  selectedInstallments: _selectedInstallments,
+                  amount: Money.tryParse(_amountController.text) ?? const Money.zero(),
+                  onChanged: (val) => setState(() => _selectedInstallments = val ?? 1),
+                ),
+                const SizedBox(height: 14),
+              ] else ...[
+                Text(
+                  _selectedType == TransactionType.expense
+                      ? 'Conta de débito *'
+                      : 'Conta de crédito *',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                const SizedBox(height: 6),
+                _buildAccountDropdown(
+                  value: _selectedAccountId,
+                  accounts: accounts,
+                  onChanged: (id) => setState(() => _selectedAccountId = id),
+                ),
+                const SizedBox(height: 14),
+              ],
               // Categoria
               Text(
                 'Categoria',
@@ -370,6 +483,105 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildPaymentMethodOption({
+    required String label,
+    required IconData icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: isSelected
+                  ? AppColors.primaryHighlight
+                  : AppColors.textSecondary,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected
+                    ? AppColors.textPrimary
+                    : AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCardDropdown({
+    required String? value,
+    required List<CreditCard> cards,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return DropdownButtonFormField<String>(
+      isExpanded: true,
+      initialValue: value,
+      dropdownColor: AppColors.surface,
+      decoration: const InputDecoration(
+        prefixIcon: Icon(Icons.credit_card, size: 20),
+      ),
+      items: cards.map((card) {
+        final digits =
+            card.lastFourDigits != null ? ' (Final ${card.lastFourDigits})' : '';
+        return DropdownMenuItem(
+          value: card.id,
+          child: Text('${card.name}$digits'),
+        );
+      }).toList(),
+      onChanged: onChanged,
+    );
+  }
+
+  Widget _buildInstallmentsDropdown({
+    required int selectedInstallments,
+    required Money amount,
+    required ValueChanged<int?> onChanged,
+  }) {
+    final options = List.generate(12, (index) => index + 1);
+    return DropdownButtonFormField<int>(
+      isExpanded: true,
+      initialValue: selectedInstallments,
+      dropdownColor: AppColors.surface,
+      decoration: const InputDecoration(
+        prefixIcon: Icon(Icons.splitscreen, size: 20),
+      ),
+      items: options.map((n) {
+        if (n == 1) {
+          return const DropdownMenuItem(
+            value: 1,
+            child: Text('1x à vista'),
+          );
+        }
+        final installmentCents = (amount.cents / n).round();
+        final installmentMoney = Money.fromCents(installmentCents);
+        final valText =
+            amount.isPositive ? ' (${installmentMoney.format()} /mês)' : '';
+        return DropdownMenuItem(
+          value: n,
+          child: Text('${n}x parcelado$valText'),
+        );
+      }).toList(),
+      onChanged: onChanged,
     );
   }
 

@@ -113,6 +113,43 @@ void main() {
       expect(find.text('Cinema Shopping'), findsOneWidget);
     });
 
+    testWidgets('permite cadastrar despesa no cartão de crédito',
+        (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(_buildTestApp());
+      await tester.pumpAndSettle();
+
+      // Toca em + Novo
+      await tester.tap(find.text('+ Novo'));
+      await tester.pumpAndSettle();
+
+      // Digita valor e descrição
+      await tester.enterText(find.byType(TextField).first, '89,90');
+      await tester.enterText(find.byType(TextField).at(1), 'Jantar Restaurante');
+      await tester.pumpAndSettle();
+
+      // Seleciona Cartão de Crédito
+      await tester.ensureVisible(find.text('Cartão de Crédito'));
+      await tester.tap(find.text('Cartão de Crédito'));
+      await tester.pumpAndSettle();
+
+      // Verifica campos do cartão
+      expect(find.text('Cartão de crédito *'), findsOneWidget);
+      expect(find.text('Parcelamento'), findsOneWidget);
+
+      // Salva
+      await tester.ensureVisible(find.text('Salvar despesa'));
+      await tester.tap(find.text('Salvar despesa'));
+      await tester.pumpAndSettle();
+
+      // Verifica na listagem
+      expect(find.text('Jantar Restaurante'), findsOneWidget);
+    });
+
     testWidgets('abre modal de detalhes ao tocar em um lançamento',
         (tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
