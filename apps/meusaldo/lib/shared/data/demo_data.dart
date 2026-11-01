@@ -167,4 +167,96 @@ abstract final class DemoData {
       ),
     ];
   }
+
+  /// Cartões de crédito pré-carregados para a aba de Cartões & Faturas.
+  static List<CreditCard> get creditCards => [
+        CreditCard.create(
+          id: 'card-nubank',
+          name: 'Nubank Ultravioleta',
+          totalLimit: const Money.fromCents(1200000), // R$ 12.000,00
+          usedLimit: const Money.fromCents(555000), // R$ 5.550,00 (46% usado, 54% livre)
+          closingDay: 3,
+          dueDay: 10,
+          colorHex: '#6D1834',
+          lastFourDigits: '8842',
+          isDefault: true,
+          bankId: 'nubank',
+        ),
+        CreditCard.create(
+          id: 'card-itau',
+          name: 'Itaú Click',
+          totalLimit: const Money.fromCents(500000), // R$ 5.000,00
+          usedLimit: const Money.fromCents(290000), // R$ 2.900,00 (58% usado, 42% livre)
+          closingDay: 15,
+          dueDay: 22,
+          colorHex: '#4C8DFF',
+          lastFourDigits: '1049',
+          isDefault: false,
+          bankId: 'itau',
+        ),
+      ];
+
+  /// Faturas de exemplo para os cartões cadastrados.
+  static List<Invoice> getInvoices() {
+    final now = DateTime.now();
+    return [
+      Invoice.create(
+        id: 'inv-nubank-current',
+        cardId: 'card-nubank',
+        month: now.month,
+        year: now.year,
+        closingDate: DateTime(now.year, now.month, 3),
+        dueDate: DateTime(now.year, now.month, 10),
+        totalAmount: const Money.fromCents(234870), // R$ 2.348,70
+        status: InvoiceStatus.open,
+      ),
+      Invoice.create(
+        id: 'inv-itau-current',
+        cardId: 'card-itau',
+        month: now.month,
+        year: now.year,
+        closingDate: DateTime(now.year, now.month, 15),
+        dueDate: DateTime(now.year, now.month, 22),
+        totalAmount: const Money.fromCents(145000), // R$ 1.450,00
+        status: InvoiceStatus.open,
+      ),
+    ];
+  }
+
+  /// Compras parceladas ativas vinculadas aos cartões.
+  static List<CardExpense> getCardExpenses() {
+    final now = DateTime.now();
+    return [
+      CardExpense.create(
+        id: 'exp-notebook',
+        cardId: 'card-nubank',
+        description: 'Notebook Dell',
+        amount: const Money.fromCents(38990), // R$ 389,90/mês
+        date: DateTime(now.year, now.month, 15),
+        currentInstallment: 4,
+        totalInstallments: 10,
+        categoryId: 'cat-lazer',
+      ),
+      CardExpense.create(
+        id: 'exp-mercado',
+        cardId: 'card-nubank',
+        description: 'Supermercado',
+        amount: const Money.fromCents(18000), // R$ 180,00/mês
+        date: DateTime(now.year, now.month, 8),
+        currentInstallment: 2,
+        totalInstallments: 3,
+        categoryId: 'cat-alimentacao',
+      ),
+      CardExpense.create(
+        id: 'exp-curso',
+        cardId: 'card-itau',
+        description: 'Curso de Especialização',
+        amount: const Money.fromCents(12000), // R$ 120,00/mês
+        date: DateTime(now.year, now.month, 5),
+        currentInstallment: 3,
+        totalInstallments: 6,
+        categoryId: 'cat-lazer',
+      ),
+    ];
+  }
 }
