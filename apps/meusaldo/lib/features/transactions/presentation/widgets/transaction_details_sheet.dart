@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meusaldo/app/theme/theme.dart';
 import 'package:meusaldo/features/accounts/presentation/state/account_providers.dart';
+import 'package:meusaldo/features/cards/presentation/state/card_providers.dart';
 import 'package:meusaldo/features/categories/presentation/state/category_providers.dart';
 import 'package:meusaldo/features/transactions/presentation/state/transaction_providers.dart';
+import 'package:meusaldo/features/transactions/presentation/widgets/edit_transaction_sheet.dart';
 import 'package:meusaldo/features/transactions/presentation/widgets/transaction_visuals.dart';
 import 'package:meusaldo/shared/widgets/app_bottom_sheet.dart';
 import 'package:meusaldo/shared/widgets/app_button.dart';
@@ -76,7 +78,12 @@ class _TransactionDetailsSheetState
     final tx = widget.transaction;
     final color = TransactionVisuals.colorForTransaction(tx);
     final accounts = ref.watch(accountsListProvider).value ?? const [];
+    final cards = ref.watch(cardsListProvider).value ?? const [];
     final categories = ref.watch(categoriesListProvider).value ?? const [];
+
+    final cardName = tx.isCardExpense
+        ? cards.where((c) => c.id == tx.cardId).map((c) => c.name).firstOrNull
+        : null;
 
     final accountName = accounts
         .where((a) => a.id == tx.accountId)
@@ -190,10 +197,30 @@ class _TransactionDetailsSheetState
                     ),
                   ] else ...[
                     const Divider(color: AppColors.outline, height: 16),
-                    _InfoRow(
-                      label: 'Conta',
-                      value: accountName ?? 'Conta padrão',
-                    ),
+                    if (tx.isCardExpense) ...[
+                      const _InfoRow(
+                        label: 'Forma de pagamento',
+                        value: 'Cartão de crédito',
+                      ),
+                      const Divider(color: AppColors.outline, height: 16),
+                      _InfoRow(
+                        label: 'Cartão',
+                        value: cardName ?? 'Cartão de crédito',
+                      ),
+                      if ((tx.installments ?? 1) > 1) ...[
+                        const Divider(color: AppColors.outline, height: 16),
+                        _InfoRow(
+                          label: 'Parcelamento',
+                          value:
+                              '${tx.installments}x de ${Money.fromCents((tx.amount.cents / tx.installments!).round()).format()}',
+                        ),
+                      ],
+                    ] else ...[
+                      _InfoRow(
+                        label: 'Conta',
+                        value: accountName ?? 'Conta padrão',
+                      ),
+                    ],
                     if (categoryName != null) ...[
                       const Divider(color: AppColors.outline, height: 16),
                       _InfoRow(
@@ -226,6 +253,18 @@ class _TransactionDetailsSheetState
               ),
             ),
             const SizedBox(height: 24),
+
+            // Botão Editar
+            AppButton(
+              key: const Key('details_edit_button'),
+              label: 'Editar lançamento',
+              icon: Icons.edit_outlined,
+              onPressed: () async {
+                Navigator.of(context).pop(false);
+                await EditTransactionSheet.show(context, transaction: tx);
+              },
+            ),
+            const SizedBox(height: 10),
 
             // Botão Excluir
             AppButton.destructive(
