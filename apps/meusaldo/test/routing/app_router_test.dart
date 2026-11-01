@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:meusaldo/app/app.dart';
+import 'package:meusaldo/features/cards/presentation/screens/cards_screen.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +31,7 @@ void main() {
       // Alterna para Cartões
       await tester.tap(find.text('Cartões'));
       await tester.pumpAndSettle();
-      expect(find.text('Cartões de crédito'), findsOneWidget);
+      expect(find.byType(CardsScreen), findsOneWidget);
 
       // Alterna para Mais
       await tester.tap(find.text('Mais'));
