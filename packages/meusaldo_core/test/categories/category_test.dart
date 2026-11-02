@@ -58,5 +58,35 @@ void main() {
       final updated = cat.copyWith(name: 'Saúde & Bem-estar');
       expect(updated.name, equals('Saúde & Bem-estar'));
     });
+
+    test('permite definir, atualizar e remover teto orçamentário mensal', () {
+      final cat = Category.create(
+        id: 'cat-alimentacao',
+        name: 'Alimentação',
+        type: CategoryType.expense,
+        monthlyBudget: const Money.fromCents(150000),
+      );
+
+      expect(cat.monthlyBudget, equals(const Money.fromCents(150000)));
+
+      // Rejeita orçamento negativo
+      expect(
+        () => Category.create(
+          id: 'cat-neg',
+          name: 'Teste',
+          type: CategoryType.expense,
+          monthlyBudget: const Money.fromCents(-100),
+        ),
+        throwsArgumentError,
+      );
+
+      // Atualiza orçamento
+      final catUpdated = cat.copyWith(monthlyBudget: const Money.fromCents(180000));
+      expect(catUpdated.monthlyBudget, equals(const Money.fromCents(180000)));
+
+      // Remove orçamento
+      final catNoBudget = catUpdated.copyWith(clearBudget: true);
+      expect(catNoBudget.monthlyBudget, isNull);
+    });
   });
 }

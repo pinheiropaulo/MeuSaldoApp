@@ -4,6 +4,8 @@ import 'package:meusaldo/app/theme/theme.dart';
 import 'package:meusaldo/features/accounts/presentation/state/account_providers.dart';
 import 'package:meusaldo/features/cards/presentation/state/card_providers.dart';
 import 'package:meusaldo/features/categories/presentation/state/category_providers.dart';
+import 'package:meusaldo/features/categories/presentation/widgets/category_picker_sheet.dart';
+import 'package:meusaldo/features/categories/presentation/widgets/category_visuals.dart';
 import 'package:meusaldo/features/transactions/presentation/state/transaction_providers.dart';
 import 'package:meusaldo/features/transactions/presentation/widgets/transaction_amount_hero_input.dart';
 import 'package:meusaldo/features/transactions/presentation/widgets/transaction_date_picker_field.dart';
@@ -226,17 +228,6 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
     if (_selectedCardId == null && cards.isNotEmpty) {
       _selectedCardId = cards.first.id;
     }
-
-    // Filtra categorias compatíveis com o tipo selecionado
-    final filteredCategories = categories.where((c) {
-      if (_selectedType == TransactionType.income) {
-        return c.type == CategoryType.income;
-      }
-      if (_selectedType == TransactionType.expense) {
-        return c.type == CategoryType.expense;
-      }
-      return false;
-    }).toList();
 
     // Se a conta padrão ainda não foi selecionada, pega a primeira
     if (_selectedAccountId == null && accounts.isNotEmpty) {
@@ -475,21 +466,82 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
                 ),
               ),
               const SizedBox(height: 6),
-              DropdownButtonFormField<String>(
-                isExpanded: true,
-                initialValue: _selectedCategoryId,
-                dropdownColor: AppColors.surface,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.category_outlined, size: 20),
-                  hintText: 'Selecione uma categoria (opcional)',
-                ),
-                items: filteredCategories.map((c) {
-                  return DropdownMenuItem(
-                    value: c.id,
-                    child: Text(c.name),
+              InkWell(
+                key: const Key('transaction_form_category_picker'),
+                borderRadius: BorderRadius.circular(10),
+                onTap: () async {
+                  final cat = await CategoryPickerSheet.show(
+                    context,
+                    selectedCategoryId: _selectedCategoryId,
+                    initialType: _selectedType == TransactionType.income
+                        ? CategoryType.income
+                        : CategoryType.expense,
                   );
-                }).toList(),
-                onChanged: (id) => setState(() => _selectedCategoryId = id),
+                  if (cat != null) {
+                    setState(() => _selectedCategoryId = cat.id);
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceElevated,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: _selectedCategoryId != null
+                          ? AppColors.primaryHighlight.withValues(alpha: 0.5)
+                          : AppColors.outline,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      if (_selectedCategoryId != null &&
+                          categories.any((c) => c.id == _selectedCategoryId)) ...[
+                        Builder(
+                          builder: (context) {
+                            final cat = categories.firstWhere((c) => c.id == _selectedCategoryId);
+                            final color = CategoryVisuals.colorForCategory(cat);
+                            final icon = CategoryVisuals.iconForCategory(cat);
+                            return Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 28,
+                                  height: 28,
+                                  decoration: BoxDecoration(
+                                    color: color.withValues(alpha: 0.15),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(icon, size: 16, color: color),
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  cat.name,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ] else ...[
+                        const Icon(Icons.category_outlined, size: 20, color: AppColors.textSecondary),
+                        const SizedBox(width: 10),
+                        const Text(
+                          'Toque para selecionar categoria',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                      const Spacer(),
+                      const Icon(Icons.expand_more, size: 20, color: AppColors.textSecondary),
+                    ],
+                  ),
+                ),
               ),
             ],
             const SizedBox(height: 14),

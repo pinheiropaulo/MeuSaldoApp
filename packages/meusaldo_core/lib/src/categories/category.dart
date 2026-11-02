@@ -1,4 +1,5 @@
 import 'package:meusaldo_core/src/categories/category_type.dart';
+import 'package:meusaldo_core/src/shared/money.dart';
 import 'package:meusaldo_core/src/transactions/transaction_type.dart';
 
 /// Representa uma categoria de classificação financeira (ex: "Alimentação", "Salário", "Transporte").
@@ -21,6 +22,9 @@ class Category {
   /// Descrição detalhada ou dicas de uso.
   final String? description;
 
+  /// Limite / teto orçamentário mensal definido para a categoria.
+  final Money? monthlyBudget;
+
   /// Indica se a categoria foi arquivada pelo usuário.
   final bool isArchived;
 
@@ -31,6 +35,7 @@ class Category {
     this.iconKey,
     this.colorHex,
     this.description,
+    this.monthlyBudget,
     this.isArchived = false,
   });
 
@@ -42,6 +47,7 @@ class Category {
     String? iconKey,
     String? colorHex,
     String? description,
+    Money? monthlyBudget,
     bool isArchived = false,
   }) {
     final trimmedId = id.trim();
@@ -62,6 +68,14 @@ class Category {
       );
     }
 
+    if (monthlyBudget != null && monthlyBudget.isNegative) {
+      throw ArgumentError.value(
+        monthlyBudget,
+        'monthlyBudget',
+        'O teto orçamentário da categoria não pode ser negativo.',
+      );
+    }
+
     return Category(
       id: trimmedId,
       name: trimmedName,
@@ -69,6 +83,7 @@ class Category {
       iconKey: iconKey,
       colorHex: colorHex,
       description: description?.trim(),
+      monthlyBudget: monthlyBudget,
       isArchived: isArchived,
     );
   }
@@ -91,6 +106,8 @@ class Category {
     String? iconKey,
     String? colorHex,
     String? description,
+    Money? monthlyBudget,
+    bool clearBudget = false,
     bool? isArchived,
   }) {
     return Category.create(
@@ -100,6 +117,7 @@ class Category {
       iconKey: iconKey ?? this.iconKey,
       colorHex: colorHex ?? this.colorHex,
       description: description ?? this.description,
+      monthlyBudget: clearBudget ? null : (monthlyBudget ?? this.monthlyBudget),
       isArchived: isArchived ?? this.isArchived,
     );
   }
@@ -115,6 +133,7 @@ class Category {
           iconKey == other.iconKey &&
           colorHex == other.colorHex &&
           description == other.description &&
+          monthlyBudget == other.monthlyBudget &&
           isArchived == other.isArchived;
 
   @override
@@ -126,10 +145,11 @@ class Category {
     iconKey,
     colorHex,
     description,
+    monthlyBudget,
     isArchived,
   );
 
   @override
   String toString() =>
-      'Category(id: $id, name: $name, type: ${type.name}, isArchived: $isArchived)';
+      'Category(id: $id, name: $name, type: ${type.name}, monthlyBudget: $monthlyBudget, isArchived: $isArchived)';
 }
