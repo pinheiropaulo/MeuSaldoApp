@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:meusaldo/app/routing/app_routes.dart';
 import 'package:meusaldo/app/theme/theme.dart';
 import 'package:meusaldo/shared/widgets/app_button.dart';
 
@@ -88,16 +90,7 @@ class _LoginFormState extends State<LoginForm> {
         Align(
           alignment: Alignment.centerRight,
           child: TextButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Recuperação de senha enviada para seu e-mail.',
-                  ),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            },
+            onPressed: () => context.push(AppRoutes.forgotPassword),
             child: const Text(
               'Esqueci minha senha',
               style: TextStyle(fontSize: 12, color: AppColors.primaryHighlight),

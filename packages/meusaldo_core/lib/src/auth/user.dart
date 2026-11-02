@@ -9,6 +9,12 @@ class User {
   /// E-mail de login e notificações.
   final String email;
 
+  /// URL ou caminho da foto de perfil (opcional).
+  final String? photoUrl;
+
+  /// Celular ou WhatsApp (opcional).
+  final String? phone;
+
   /// Data de criação da conta.
   final DateTime createdAt;
 
@@ -16,6 +22,8 @@ class User {
     required this.id,
     required this.name,
     required this.email,
+    this.photoUrl,
+    this.phone,
     required this.createdAt,
   });
 
@@ -24,6 +32,8 @@ class User {
     required String id,
     required String name,
     required String email,
+    String? photoUrl,
+    String? phone,
     DateTime? createdAt,
   }) {
     final trimmedId = id.trim();
@@ -45,7 +55,26 @@ class User {
       id: trimmedId,
       name: trimmedName,
       email: trimmedEmail,
+      photoUrl: photoUrl,
+      phone: phone,
       createdAt: createdAt ?? DateTime.now(),
+    );
+  }
+
+  /// Retorna uma cópia atualizada do usuário.
+  User copyWith({
+    String? name,
+    String? email,
+    String? photoUrl,
+    String? phone,
+  }) {
+    return User.create(
+      id: id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      photoUrl: photoUrl ?? this.photoUrl,
+      phone: phone ?? this.phone,
+      createdAt: createdAt,
     );
   }
 
@@ -56,10 +85,13 @@ class User {
           runtimeType == other.runtimeType &&
           id == other.id &&
           name == other.name &&
-          email == other.email;
+          email == other.email &&
+          photoUrl == other.photoUrl &&
+          phone == other.phone;
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, email);
+  int get hashCode =>
+      Object.hash(runtimeType, id, name, email, photoUrl, phone);
 
   @override
   String toString() => 'User(id: $id, name: $name, email: $email)';

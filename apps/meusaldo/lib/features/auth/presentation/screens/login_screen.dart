@@ -33,7 +33,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       _errorMessage = null;
     });
 
-    final result = await ref.read(authStateProvider.notifier).login(
+    final result = await ref
+        .read(authStateProvider.notifier)
+        .login(
           email: email,
           password: password,
         );
@@ -52,8 +54,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     } else {
       setState(() {
-        _errorMessage = result.failureOrNull?.message ??
-            'E-mail ou senha incorretos. Verifique seus dados e tente novamente.';
+        _errorMessage = result.failureOrNull?.message ?? 'E-mail ou senha incorretos. Verifique seus dados e tente novamente.';
       });
     }
   }
@@ -73,7 +74,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 children: [
                   const AuthHeader(
                     title: 'Acesse sua conta',
-                    subtitle: 'Informe seu e-mail e senha cadastrados para entrar',
+                    subtitle:
+                        'Informe seu e-mail e senha cadastrados para entrar',
                   ),
                   const SizedBox(height: 20),
                   if (_errorMessage != null) ...[
@@ -89,7 +91,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 24),
                   const Text(
                     'Termos de Uso  •  Privacidade  •  Segurança',
-                    style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textSecondary,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -111,14 +116,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
         ),
         TextButton(
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Tela de cadastro disponível em breve.'),
-                duration: Duration(seconds: 2),
-              ),
-            );
-          },
+          onPressed: () => context.push(AppRoutes.register),
           child: const Text(
             'Criar conta',
             style: TextStyle(

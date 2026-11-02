@@ -22,4 +22,16 @@ abstract interface class AuthRepository {
 
   /// Retorna o usuário autenticado na sessão atual, se houver.
   Future<Result<User?, Failure>> getCurrentUser();
+
+  /// Envia e-mail de recuperação/redefinição de senha.
+  Future<Result<void, Failure>> resetPassword({
+    required String email,
+  });
+
+  /// Atualiza o perfil do usuário logado.
+  Future<Result<User, Failure>> updateProfile({
+    required String name,
+    String? photoUrl,
+    String? phone,
+  });
 }

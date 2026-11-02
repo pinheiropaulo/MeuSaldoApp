@@ -48,6 +48,30 @@ class AuthNotifier extends AsyncNotifier<User?> {
     return result;
   }
 
+  /// Envia e-mail de recuperação de senha.
+  Future<Result<void, Failure>> resetPassword({required String email}) async {
+    final repo = ref.read(authRepositoryProvider);
+    return repo.resetPassword(email: email);
+  }
+
+  /// Atualiza os dados do perfil do usuário autenticado.
+  Future<Result<User, Failure>> updateProfile({
+    required String name,
+    String? photoUrl,
+    String? phone,
+  }) async {
+    final repo = ref.read(authRepositoryProvider);
+    final result = await repo.updateProfile(
+      name: name,
+      photoUrl: photoUrl,
+      phone: phone,
+    );
+    if (result.isSuccess) {
+      state = AsyncData(result.valueOrNull);
+    }
+    return result;
+  }
+
   /// Encerra a sessão atual.
   Future<void> logout() async {
     final repo = ref.read(authRepositoryProvider);

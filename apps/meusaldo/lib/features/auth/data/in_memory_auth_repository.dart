@@ -68,6 +68,51 @@ class InMemoryAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<Result<void, Failure>> resetPassword({
+    required String email,
+  }) async {
+    final cleanEmail = email.trim().toLowerCase();
+    if (cleanEmail.isEmpty || !cleanEmail.contains('@')) {
+      return const Result.failure(
+        ValidationFailure('Informe um endereço de e-mail válido para recuperação.'),
+      );
+    }
+    return const Result.success(null);
+  }
+
+  @override
+  Future<Result<User, Failure>> updateProfile({
+    required String name,
+    String? photoUrl,
+    String? phone,
+  }) async {
+    final cleanName = name.trim();
+    if (cleanName.isEmpty) {
+      return const Result.failure(
+        ValidationFailure('O nome não pode ser vazio.'),
+      );
+    }
+
+    if (_currentUser == null) {
+      _currentUser = User.create(
+        id: 'usr-default',
+        name: cleanName,
+        email: 'paulo@meusaldo.app',
+        photoUrl: photoUrl,
+        phone: phone,
+      );
+    } else {
+      _currentUser = _currentUser!.copyWith(
+        name: cleanName,
+        photoUrl: photoUrl,
+        phone: phone,
+      );
+    }
+
+    return Result.success(_currentUser!);
+  }
+
+  @override
   Future<Result<void, Failure>> logout() async {
     _currentUser = null;
     return const Result.success(null);
