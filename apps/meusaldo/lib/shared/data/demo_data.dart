@@ -40,6 +40,7 @@ abstract final class DemoData {
       iconKey: 'restaurant',
       colorHex: '#F04444',
       description: 'Supermercado, restaurantes e delivery',
+      monthlyBudget: const Money.fromCents(150000), // R$ 1.500,00
     ),
     Category.create(
       id: 'cat-moradia',
@@ -48,6 +49,7 @@ abstract final class DemoData {
       iconKey: 'home',
       colorHex: '#FF8C42',
       description: 'Aluguel, luz, água e internet',
+      monthlyBudget: const Money.fromCents(200000), // R$ 2.000,00
     ),
     Category.create(
       id: 'cat-transporte',
@@ -56,6 +58,7 @@ abstract final class DemoData {
       iconKey: 'directions_car',
       colorHex: '#4C8DFF',
       description: 'Combustível, transporte público e aplicativos',
+      monthlyBudget: const Money.fromCents(50000), // R$ 500,00
     ),
     Category.create(
       id: 'cat-saude',
@@ -72,6 +75,7 @@ abstract final class DemoData {
       iconKey: 'sports_esports',
       colorHex: '#9B51E0',
       description: 'Passeios, cinemas e assinaturas',
+      monthlyBudget: const Money.fromCents(30000), // R$ 300,00
     ),
 
     // Receitas

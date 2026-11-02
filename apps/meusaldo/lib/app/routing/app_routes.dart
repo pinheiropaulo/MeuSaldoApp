@@ -6,6 +6,15 @@ abstract final class AppRoutes {
   /// Tela de autenticação e login.
   static const String login = '/login';
 
+  /// Tela de cadastro de novo usuário.
+  static const String register = '/register';
+
+  /// Tela de recuperação de senha.
+  static const String forgotPassword = '/forgot-password';
+
+  /// Tela de edição de perfil do usuário.
+  static const String editProfile = '/profile/edit';
+
   /// Aba Início / Visão Geral.
   static const String home = '/';
 
@@ -32,6 +41,21 @@ abstract final class AppRoutes {
 
   /// Tela de Detalhes da Fatura de Cartão de Crédito.
   static const String cardInvoice = '/cards/:id/invoice';
+
+  /// Tela de Gestão e Listagem de Categorias.
+  static const String categories = '/categories';
+
+  /// Tela de Detalhes Analíticos da Categoria.
+  static const String categoryDetails = '/categories/:id';
+
+  /// Tela de Gestão de Orçamentos e Tetos de Gastos.
+  static const String budgets = '/budgets';
+
+  /// Tela de Configurações Gerais e Preferências.
+  static const String settings = '/settings';
+
+  /// Tela de Relatório Mensal e Gráficos Analíticos.
+  static const String reports = '/reports';
 
   /// Aba Mais / Menu e Configurações.
   static const String more = '/more';

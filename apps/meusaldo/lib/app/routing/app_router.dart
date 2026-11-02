@@ -6,13 +6,21 @@ import 'package:meusaldo/app/routing/scaffold_shell.dart';
 import 'package:meusaldo/features/accounts/presentation/screens/account_details_screen.dart';
 import 'package:meusaldo/features/accounts/presentation/screens/accounts_screen.dart';
 import 'package:meusaldo/features/accounts/presentation/screens/edit_account_screen.dart';
+import 'package:meusaldo/features/auth/presentation/screens/edit_profile_screen.dart';
+import 'package:meusaldo/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:meusaldo/features/auth/presentation/screens/login_screen.dart';
+import 'package:meusaldo/features/auth/presentation/screens/register_screen.dart';
 import 'package:meusaldo/features/auth/presentation/screens/splash_screen.dart';
 import 'package:meusaldo/features/auth/presentation/state/auth_providers.dart';
 import 'package:meusaldo/features/cards/presentation/screens/cards_screen.dart';
 import 'package:meusaldo/features/cards/presentation/screens/invoice_details_screen.dart';
+import 'package:meusaldo/features/categories/presentation/screens/budgets_screen.dart';
+import 'package:meusaldo/features/categories/presentation/screens/categories_screen.dart';
+import 'package:meusaldo/features/categories/presentation/screens/category_details_screen.dart';
 import 'package:meusaldo/features/home/presentation/screens/home_screen.dart';
 import 'package:meusaldo/features/more/presentation/screens/more_screen.dart';
+import 'package:meusaldo/features/reports/presentation/screens/monthly_report_screen.dart';
+import 'package:meusaldo/features/settings/presentation/screens/settings_screen.dart';
 import 'package:meusaldo/features/transactions/presentation/screens/bill_schedule_screen.dart';
 import 'package:meusaldo/features/transactions/presentation/screens/recurring_transactions_screen.dart';
 import 'package:meusaldo/features/transactions/presentation/screens/transactions_screen.dart';
@@ -34,13 +42,18 @@ class AuthRouterNotifier extends ChangeNotifier {
 
     final isLoggedIn = authState.value != null;
     final isLoggingIn = state.matchedLocation == AppRoutes.login;
+    final isRegistering = state.matchedLocation == AppRoutes.register;
+    final isForgotPassword = state.matchedLocation == AppRoutes.forgotPassword;
     final isSplashing = state.matchedLocation == AppRoutes.splash;
 
     if (!isLoggedIn) {
-      return isLoggingIn ? null : AppRoutes.login;
+      if (isLoggingIn || isRegistering || isForgotPassword) {
+        return null;
+      }
+      return AppRoutes.login;
     }
 
-    if (isLoggingIn || isSplashing) {
+    if (isLoggingIn || isSplashing || isRegistering || isForgotPassword) {
       return AppRoutes.home;
     }
 
@@ -78,12 +91,47 @@ GoRouter createRouter({
         builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
+        path: AppRoutes.register,
+        builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.forgotPassword,
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.editProfile,
+        builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.schedule,
         builder: (context, state) => const BillScheduleScreen(),
       ),
       GoRoute(
         path: AppRoutes.recurring,
         builder: (context, state) => const RecurringTransactionsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.categories,
+        builder: (context, state) => const CategoriesScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.categoryDetails,
+        builder: (context, state) {
+          final categoryId = state.pathParameters['id']!;
+          return CategoryDetailsScreen(categoryId: categoryId);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.budgets,
+        builder: (context, state) => const BudgetsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.settings,
+        builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.reports,
+        builder: (context, state) => const MonthlyReportScreen(),
       ),
       GoRoute(
         path: AppRoutes.accountDetails,

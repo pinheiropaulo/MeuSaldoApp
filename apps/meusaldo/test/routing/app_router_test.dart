@@ -52,11 +52,11 @@ void main() {
       // Alterna para Mais
       await tester.tap(find.widgetWithText(NavigationDestination, 'Mais'));
       await tester.pumpAndSettle();
-      expect(find.text('Gestão Financeira'), findsOneWidget);
+      expect(find.text('CADASTROS & CLASSIFICAÇÃO'), findsOneWidget);
 
       await tester.ensureVisible(find.byKey(const Key('more_logout_button')));
       await tester.pumpAndSettle();
-      expect(find.text('Sair da conta'), findsOneWidget);
+      expect(find.text('Encerrar Sessão'), findsOneWidget);
 
       // Retorna para Início
       await tester.tap(find.widgetWithText(NavigationDestination, 'Início'));
@@ -91,12 +91,16 @@ void main() {
       // Vai até a aba Mais e faz Logout
       await tester.tap(find.widgetWithText(NavigationDestination, 'Mais'));
       await tester.pumpAndSettle();
-      expect(find.text('Gestão Financeira'), findsOneWidget);
+      expect(find.text('CADASTROS & CLASSIFICAÇÃO'), findsOneWidget);
 
       await tester.ensureVisible(find.byKey(const Key('more_logout_button')));
       await tester.pumpAndSettle();
 
       await tester.tap(find.byKey(const Key('more_logout_button')));
+      await tester.pumpAndSettle();
+
+      // Confirma no diálogo de encerramento de sessão
+      await tester.tap(find.text('Sair'));
       await tester.pumpAndSettle();
 
       // Após logout, redireciona de volta para a tela de login
