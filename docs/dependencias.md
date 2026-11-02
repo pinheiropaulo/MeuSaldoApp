@@ -55,14 +55,16 @@ Localização significa idioma e formatos regionais, não geolocalização físi
 
 `intl` formata dados para exibição. Ele não substitui o value object `Money`: valores financeiros continuam armazenados e calculados em centavos inteiros.
 
-## Persistência local — adotada, com papel pendente
+## Backend remoto — adotado
 
-### `drift`, `drift_flutter`, `drift_dev` e `build_runner`
+### `supabase_flutter`
 
-- Uso: banco SQLite tipado, migrations, consultas relacionais e geração de código.
-- Camada: implementações de repositório em `apps/meusaldo`.
-- Situação: instalados. O projeto possui `AppDatabase`, tabelas, conversores e mapeadores.
-- Decisão pendente: definir se Drift será cache/offline após a adoção do Supabase. Não criar uma segunda fonte de verdade sem sincronização definida.
+- Uso: autenticação, banco PostgreSQL remoto (RLS) e sincronização de dados do usuário.
+- Camada: `apps/meusaldo`; jamais no `meusaldo_core`.
+- Situação: instalado e integrado com repositórios remotos para autenticação, contas, categorias, transações e cartões de crédito.
+- Dados financeiros: valores persistidos em centavos inteiros (`BIGINT`); regras de cálculo continuam no Core.
+
+## Persistência local & Testes
 
 ### `shared_preferences`
 
@@ -70,14 +72,14 @@ Localização significa idioma e formatos regionais, não geolocalização físi
 - Camada: `apps/meusaldo`.
 - Não usar para dados financeiros, tokens ou segredos.
 
-## Backend remoto — planejado
+### Repositórios em Memória (`InMemory*Repository`)
 
-### `supabase_flutter`
+- Uso: dublês de teste (test fakes) para execução instantânea da suíte de testes de UI e widget sem dependência de rede externa ou credenciais remotas.
+- Camada: `apps/meusaldo/lib/features/*/data/`.
 
-- Uso: autenticação, banco PostgreSQL remoto e sincronização de dados do usuário.
-- Camada: `apps/meusaldo`; jamais no `meusaldo_core`.
-- Entrada: somente após a modelagem das tabelas, RLS e estratégia de falhas/offline estarem documentadas e autorizadas.
-- Dados financeiros: valores persistidos em centavos inteiros; regras de cálculo continuam no Core.
+### `drift`, `drift_flutter`, `drift_dev` e `build_runner` (Descontinuados e Removidos)
+
+- Situação: removidos do projeto. O MeuSaldo opera com o Supabase como fonte única da verdade para dados em nuvem, eliminando a sobrecarga de um banco SQLite secundário redundante.
 
 ## Segurança e alertas — futuros
 
