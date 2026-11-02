@@ -1,11 +1,22 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meusaldo/app/config/app_config.dart';
 import 'package:meusaldo/features/categories/data/in_memory_category_repository.dart';
+import 'package:meusaldo/features/categories/data/supabase_category_repository.dart';
 import 'package:meusaldo_core/meusaldo_core.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as sp;
 
 /// Provedor do repositório de categorias.
 final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {
+  if (AppConfig.isSupabaseConfigured) {
+    try {
+      final client = sp.Supabase.instance.client;
+      return SupabaseCategoryRepository(client: client);
+    } catch (_) {
+      // Supabase não inicializado (ex: testes de widget isolados)
+    }
+  }
   return InMemoryCategoryRepository();
 });
 

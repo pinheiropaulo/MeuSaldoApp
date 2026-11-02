@@ -1,13 +1,24 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meusaldo/app/config/app_config.dart';
 import 'package:meusaldo/features/accounts/presentation/state/account_providers.dart';
 import 'package:meusaldo/features/cards/presentation/state/card_providers.dart';
 import 'package:meusaldo/features/transactions/data/in_memory_transaction_repository.dart';
+import 'package:meusaldo/features/transactions/data/supabase_transaction_repository.dart';
 import 'package:meusaldo_core/meusaldo_core.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as sp;
 
 /// Provedor do repositório de lançamentos financeiros.
 final transactionRepositoryProvider = Provider<TransactionRepository>((ref) {
+  if (AppConfig.isSupabaseConfigured) {
+    try {
+      final client = sp.Supabase.instance.client;
+      return SupabaseTransactionRepository(client: client);
+    } catch (_) {
+      // Supabase não inicializado (ex: testes de widget isolados)
+    }
+  }
   return InMemoryTransactionRepository();
 });
 

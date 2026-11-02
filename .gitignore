@@ -1,0 +1,17 @@
+# Environment & Secrets
+.env*
+env.json
+env.*.json
+!env.example.json
+
+# IDE / Editors
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

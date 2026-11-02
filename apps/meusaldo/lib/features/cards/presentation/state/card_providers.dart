@@ -1,11 +1,22 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meusaldo/app/config/app_config.dart';
 import 'package:meusaldo/features/cards/data/in_memory_credit_card_repository.dart';
+import 'package:meusaldo/features/cards/data/supabase_card_repository.dart';
 import 'package:meusaldo_core/meusaldo_core.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as sp;
 
 /// Provedor do repositório de cartões de crédito.
 final creditCardRepositoryProvider = Provider<CreditCardRepository>((ref) {
+  if (AppConfig.isSupabaseConfigured) {
+    try {
+      final client = sp.Supabase.instance.client;
+      return SupabaseCardRepository(client: client);
+    } catch (_) {
+      // Supabase não inicializado (ex: testes de widget isolados)
+    }
+  }
   return InMemoryCreditCardRepository();
 });
 

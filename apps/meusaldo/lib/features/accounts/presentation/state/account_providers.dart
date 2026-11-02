@@ -1,11 +1,22 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meusaldo/app/config/app_config.dart';
 import 'package:meusaldo/features/accounts/data/in_memory_account_repository.dart';
+import 'package:meusaldo/features/accounts/data/supabase_account_repository.dart';
 import 'package:meusaldo_core/meusaldo_core.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as sp;
 
 /// Provedor do repositório de contas financeiras.
 final accountRepositoryProvider = Provider<AccountRepository>((ref) {
+  if (AppConfig.isSupabaseConfigured) {
+    try {
+      final client = sp.Supabase.instance.client;
+      return SupabaseAccountRepository(client: client);
+    } catch (_) {
+      // Supabase não inicializado (ex: testes de widget isolados)
+    }
+  }
   return InMemoryAccountRepository();
 });
 

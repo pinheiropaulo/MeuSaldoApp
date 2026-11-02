@@ -1,11 +1,22 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meusaldo/app/config/app_config.dart';
 import 'package:meusaldo/features/auth/data/in_memory_auth_repository.dart';
+import 'package:meusaldo/features/auth/data/supabase_auth_repository.dart';
 import 'package:meusaldo_core/meusaldo_core.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as sp;
 
 /// Provedor do repositório de autenticação.
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  if (AppConfig.isSupabaseConfigured) {
+    try {
+      final client = sp.Supabase.instance.client;
+      return SupabaseAuthRepository(client: client);
+    } catch (_) {
+      // Supabase não inicializado (ex: em testes de widget isolados)
+    }
+  }
   return InMemoryAuthRepository();
 });
 
