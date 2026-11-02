@@ -119,6 +119,14 @@ void main() {
       await tester.tap(find.byKey(const Key('register_submit_button')));
       await tester.pumpAndSettle();
 
+      // Diálogo de confirmação de e-mail é exibido
+      expect(find.text('Confirme seu E-mail'), findsOneWidget);
+      expect(find.byKey(const Key('register_confirm_dialog_button')), findsOneWidget);
+
+      // Clica no botão para prosseguir para o login
+      await tester.tap(find.byKey(const Key('register_confirm_dialog_button')));
+      await tester.pumpAndSettle();
+
       expect(successCalled, isTrue);
       final currentUser = container.read(authStateProvider).value;
       expect(currentUser, isNotNull);

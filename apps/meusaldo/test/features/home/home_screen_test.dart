@@ -3,9 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meusaldo/app/theme/theme.dart';
+import 'package:meusaldo/features/accounts/data/in_memory_account_repository.dart';
+import 'package:meusaldo/features/accounts/presentation/state/account_providers.dart';
+import 'package:meusaldo/features/accounts/presentation/widgets/account_form_sheet.dart';
 import 'package:meusaldo/features/home/presentation/screens/home_screen.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_accounts_section.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_balance_card.dart';
+import 'package:meusaldo/features/home/presentation/widgets/home_first_account_banner.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_header.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_quick_actions.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_upcoming_alert.dart';
@@ -144,6 +148,38 @@ void main() {
 
       // Confirma redirecionamento
       expect(find.text('Tela Contas'), findsOneWidget);
+    });
+
+    testWidgets('exibe banner de primeiro acesso e aciona cadastro de conta quando não há contas',
+        (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            accountRepositoryProvider.overrideWithValue(
+              InMemoryAccountRepository(initialAccounts: const []),
+            ),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.darkTheme,
+            home: const HomeScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Verifica exibição do banner de boas-vindas / primeiro acesso
+      expect(find.byType(HomeFirstAccountBanner), findsOneWidget);
+      expect(find.text('Bem-vindo ao MeuSaldo! 👋'), findsOneWidget);
+      expect(find.byKey(const Key('home_create_first_account_button')), findsOneWidget);
+
+      // Verifica que o modal de cadastro de conta foi acionado automaticamente
+      expect(find.byType(AccountFormSheet), findsOneWidget);
+      expect(find.text('Nova conta'), findsOneWidget);
     });
   });
 }

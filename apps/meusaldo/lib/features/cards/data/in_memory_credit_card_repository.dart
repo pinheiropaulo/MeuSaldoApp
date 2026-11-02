@@ -12,13 +12,22 @@ class InMemoryCreditCardRepository implements CreditCardRepository {
     List<Invoice>? initialInvoices,
     List<CardExpense>? initialExpenses,
   }) {
-    final seedCards = initialCards ?? DemoData.creditCards;
+    final seedCards = initialCards ?? const [];
     for (final card in seedCards) {
       _cards[card.id] = card;
     }
 
-    _invoices.addAll(initialInvoices ?? DemoData.getInvoices());
-    _expenses.addAll(initialExpenses ?? DemoData.getCardExpenses());
+    _invoices.addAll(initialInvoices ?? const []);
+    _expenses.addAll(initialExpenses ?? const []);
+  }
+
+  /// Construtor de demonstração para testes que necessitam de dados mockados prévios.
+  factory InMemoryCreditCardRepository.withDemoData() {
+    return InMemoryCreditCardRepository(
+      initialCards: DemoData.creditCards,
+      initialInvoices: DemoData.getInvoices(),
+      initialExpenses: DemoData.getCardExpenses(),
+    );
   }
 
   @override

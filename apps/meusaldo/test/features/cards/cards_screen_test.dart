@@ -14,8 +14,9 @@ import 'package:meusaldo_core/meusaldo_core.dart';
 Widget _buildTestApp({CreditCardRepository? repository}) {
   return ProviderScope(
     overrides: [
-      if (repository != null)
-        creditCardRepositoryProvider.overrideWithValue(repository),
+      creditCardRepositoryProvider.overrideWithValue(
+        repository ?? InMemoryCreditCardRepository.withDemoData(),
+      ),
     ],
     child: MaterialApp(
       theme: AppTheme.darkTheme,

@@ -108,7 +108,7 @@ class ProfileFormFields extends StatelessWidget {
                       ),
                       SizedBox(height: 2),
                       Text(
-                        'Real Brasileiro (R\$)',
+                        'Real Brasileiro (BRL • R\$)',
                         style: TextStyle(
                           fontSize: 11,
                           color: AppColors.textSecondary,
@@ -116,10 +116,33 @@ class ProfileFormFields extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Icon(
-                    Icons.lock_outline,
-                    size: 18,
-                    color: AppColors.textSecondary.withValues(alpha: 0.7),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceElevated,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: AppColors.outline),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          size: 13,
+                          color: AppColors.primaryHighlight,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          'Padrão BRL',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryHighlight,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

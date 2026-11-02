@@ -29,10 +29,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     super.initState();
     final user = ref.read(authStateProvider).value;
     _nameController = TextEditingController(
-      text: user?.name ?? 'Paulo Pinheiro',
+      text: user?.name ?? '',
     );
     _emailController = TextEditingController(
-      text: user?.email ?? 'paulo@meusaldo.app',
+      text: user?.email ?? '',
     );
     _phoneController = TextEditingController(text: user?.phone ?? '');
   }

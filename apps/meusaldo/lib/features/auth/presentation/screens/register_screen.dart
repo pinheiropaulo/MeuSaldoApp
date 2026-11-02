@@ -6,17 +6,13 @@ import 'package:meusaldo/app/theme/theme.dart';
 import 'package:meusaldo/features/auth/presentation/state/auth_providers.dart';
 import 'package:meusaldo/features/auth/presentation/widgets/auth_error_banner.dart';
 import 'package:meusaldo/features/auth/presentation/widgets/auth_header.dart';
+import 'package:meusaldo/features/auth/presentation/widgets/register/email_confirmation_dialog.dart';
 import 'package:meusaldo/features/auth/presentation/widgets/register/register_form.dart';
 
 /// Tela orquestradora para criação de nova conta de usuário no MeuSaldo.
 class RegisterScreen extends ConsumerStatefulWidget {
-  const RegisterScreen({
-    super.key,
-    this.onRegisterSuccess,
-  });
+  const RegisterScreen({super.key, this.onRegisterSuccess});
 
-  /// Callback opcional disparado quando o cadastro é concluído com sucesso.
-  /// Se omitido, navega para [AppRoutes.home] via GoRouter.
   final VoidCallback? onRegisterSuccess;
 
   @override
@@ -37,28 +33,30 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       _errorMessage = null;
     });
 
-    final result = await ref
-        .read(authStateProvider.notifier)
-        .register(
-          name: name,
-          email: email,
-          password: password,
-        );
+    final result = await ref.read(authStateProvider.notifier).register(
+      name: name,
+      email: email,
+      password: password,
+    );
 
     if (!mounted) return;
     setState(() => _isLoading = false);
 
     if (result.isSuccess) {
-      if (widget.onRegisterSuccess != null) {
-        widget.onRegisterSuccess!();
-      } else {
-        context.go(AppRoutes.home);
-      }
-    } else {
-      setState(
-        () => _errorMessage =
-            result.failureOrNull?.message ?? 'Erro ao cadastrar usuário.',
+      await EmailConfirmationDialog.show(
+        context,
+        email: email,
+        onConfirm: () {
+          if (widget.onRegisterSuccess != null) {
+            widget.onRegisterSuccess!();
+          } else {
+            context.go(AppRoutes.login);
+          }
+        },
       );
+    } else {
+      setState(() => _errorMessage =
+          result.failureOrNull?.message ?? 'Erro ao cadastrar usuário.');
     }
   }
 
@@ -68,13 +66,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go(AppRoutes.login);
-            }
-          },
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go(AppRoutes.login),
         ),
         title: const Text('MeuSaldo'),
         actions: const [
@@ -96,8 +89,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 children: [
                   const AuthHeader(
                     title: 'Criar sua conta',
-                    subtitle:
-                        'Comece a organizar suas finanças com simplicidade',
+                    subtitle: 'Comece a organizar suas finanças com simplicidade',
                   ),
                   const SizedBox(height: 20),
                   if (_errorMessage != null) ...[

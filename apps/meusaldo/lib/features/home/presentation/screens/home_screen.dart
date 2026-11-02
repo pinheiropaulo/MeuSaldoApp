@@ -4,9 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:meusaldo/app/routing/app_routes.dart';
 import 'package:meusaldo/app/theme/theme.dart';
 import 'package:meusaldo/features/accounts/presentation/state/account_providers.dart';
+import 'package:meusaldo/features/accounts/presentation/widgets/account_form_sheet.dart';
 import 'package:meusaldo/features/home/presentation/state/home_providers.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_accounts_section.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_balance_card.dart';
+import 'package:meusaldo/features/home/presentation/widgets/home_first_account_banner.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_header.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_quick_actions.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_upcoming_alert.dart';
@@ -20,11 +22,28 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final accounts = ref.watch(accountsListProvider).value ?? const [];
+    final accountsAsync = ref.watch(accountsListProvider);
+    final accounts = accountsAsync.value ?? const [];
+    final hasNoAccounts = accountsAsync.hasValue && accounts.isEmpty;
     final consolidatedBalance = ref.watch(consolidatedBalanceProvider);
     final monthlyIncome = ref.watch(currentMonthIncomeTotalProvider);
     final monthlyExpenses = ref.watch(currentMonthExpensesTotalProvider);
     final isBalanceVisible = ref.watch(isBalanceVisibleProvider);
+
+    // No primeiro acesso (quando o usuário não possui contas),
+    // aciona a tela para cadastrar sua primeira conta.
+    ref.listen<AsyncValue<List<FinancialAccount>>>(
+      accountsListProvider,
+      (prev, next) {
+        if (prev?.hasValue != true && next.hasValue && next.requireValue.isEmpty) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (context.mounted) {
+              AccountFormSheet.show(context);
+            }
+          });
+        }
+      },
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -74,6 +93,12 @@ class HomeScreen extends ConsumerWidget {
           children: [
             const HomeHeader(),
             const SizedBox(height: 18),
+            if (hasNoAccounts) ...[
+              HomeFirstAccountBanner(
+                onCreateAccount: () => AccountFormSheet.show(context),
+              ),
+              const SizedBox(height: 18),
+            ],
             HomeBalanceCard(
               consolidatedBalance: consolidatedBalance,
               monthlyIncome: monthlyIncome,
@@ -107,6 +132,7 @@ class HomeScreen extends ConsumerWidget {
               accounts: accounts,
               isVisible: isBalanceVisible,
               onViewAll: () => context.go(AppRoutes.accounts),
+              onAddAccount: () => AccountFormSheet.show(context),
             ),
             const SizedBox(height: 28),
           ],

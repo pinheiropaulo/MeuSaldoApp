@@ -15,6 +15,9 @@ class HomeAccountsSection extends StatelessWidget {
   /// Callback para navegar para a aba completa de Contas.
   final VoidCallback onViewAll;
 
+  /// Callback ao solicitar cadastro de conta quando a lista estiver vazia.
+  final VoidCallback? onAddAccount;
+
   /// Callback ao tocar em uma conta específica.
   final ValueChanged<FinancialAccount>? onAccountTap;
 
@@ -23,6 +26,7 @@ class HomeAccountsSection extends StatelessWidget {
     required this.accounts,
     required this.isVisible,
     required this.onViewAll,
+    this.onAddAccount,
     this.onAccountTap,
   });
 
@@ -59,8 +63,9 @@ class HomeAccountsSection extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         if (previewAccounts.isEmpty)
-          GestureDetector(
-            onTap: onViewAll,
+          InkWell(
+            onTap: onAddAccount ?? onViewAll,
+            borderRadius: BorderRadius.circular(12),
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -68,14 +73,24 @@ class HomeAccountsSection extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.outline, width: 1),
               ),
-              child: const Center(
-                child: Text(
-                  'Nenhuma conta cadastrada. Toque para cadastrar.',
-                  style: TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 13,
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.add_circle_outline,
+                    color: AppColors.primaryHighlight,
+                    size: 18,
                   ),
-                ),
+                  SizedBox(width: 8),
+                  Text(
+                    'Cadastrar primeira conta',
+                    style: TextStyle(
+                      color: AppColors.primaryHighlight,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
               ),
             ),
           )

@@ -81,7 +81,11 @@ void main() {
       expect(find.byType(LoginScreen), findsOneWidget);
       expect(find.text('Acesse sua conta'), findsOneWidget);
 
-      // Toca em Entrar (campos já vêm preenchidos para demonstração)
+      // Preenche as credenciais válidas e toca em Entrar
+      await tester.enterText(find.byKey(const Key('login_email_field')), 'paulo@meusaldo.app');
+      await tester.enterText(find.byKey(const Key('login_password_field')), '123456');
+      await tester.pumpAndSettle();
+
       await tester.tap(find.byKey(const Key('login_submit_button')));
       await tester.pumpAndSettle();
 

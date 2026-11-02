@@ -70,7 +70,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Clica no botão Entrar com as credenciais padrão já preenchidas
+      // Preenche as credenciais válidas
+      await tester.enterText(find.byKey(const Key('login_email_field')), 'paulo@meusaldo.app');
+      await tester.enterText(find.byKey(const Key('login_password_field')), '123456');
+      await tester.pumpAndSettle();
+
+      // Clica no botão Entrar
       await tester.tap(find.byType(AppButton));
       await tester.pumpAndSettle();
 

@@ -9,7 +9,14 @@ void main() {
     late InMemoryCreditCardRepository repository;
 
     setUp(() {
-      repository = InMemoryCreditCardRepository();
+      repository = InMemoryCreditCardRepository.withDemoData();
+    });
+
+    test('construtor padrão inicializa com listas vazias', () async {
+      final emptyRepo = InMemoryCreditCardRepository();
+      final result = await emptyRepo.getAll();
+      expect(result.isSuccess, isTrue);
+      expect(result.valueOrNull!, isEmpty);
     });
 
     test('getAll retorna os cartões pré-carregados', () async {
@@ -82,7 +89,13 @@ void main() {
     late ProviderContainer container;
 
     setUp(() {
-      container = ProviderContainer();
+      container = ProviderContainer(
+        overrides: [
+          creditCardRepositoryProvider.overrideWithValue(
+            InMemoryCreditCardRepository.withDemoData(),
+          ),
+        ],
+      );
     });
 
     tearDown(() {
