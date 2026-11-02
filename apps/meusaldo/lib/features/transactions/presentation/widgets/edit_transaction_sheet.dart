@@ -9,6 +9,7 @@ import 'package:meusaldo/features/transactions/presentation/widgets/edit_transac
 import 'package:meusaldo/features/transactions/presentation/widgets/edit_transaction_hint_banner.dart';
 import 'package:meusaldo/features/transactions/presentation/widgets/transaction_amount_hero_input.dart';
 import 'package:meusaldo/features/transactions/presentation/widgets/transaction_date_picker_field.dart';
+import 'package:meusaldo/features/transactions/presentation/widgets/transaction_status_toggle.dart';
 import 'package:meusaldo/features/transactions/presentation/widgets/transaction_type_segmented_tab.dart';
 import 'package:meusaldo/shared/widgets/app_bottom_sheet.dart';
 import 'package:meusaldo/shared/widgets/app_button.dart';
@@ -20,7 +21,10 @@ class EditTransactionSheet extends ConsumerStatefulWidget {
 
   const EditTransactionSheet({super.key, required this.transaction});
 
-  static Future<bool?> show(BuildContext context, {required Transaction transaction}) {
+  static Future<bool?> show(
+    BuildContext context, {
+    required Transaction transaction,
+  }) {
     return showAppBottomSheet<bool>(
       context: context,
       builder: (_) => EditTransactionSheet(transaction: transaction),
@@ -28,7 +32,8 @@ class EditTransactionSheet extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<EditTransactionSheet> createState() => _EditTransactionSheetState();
+  ConsumerState<EditTransactionSheet> createState() =>
+      _EditTransactionSheetState();
 }
 
 class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
@@ -37,6 +42,7 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
   late final TextEditingController _descController;
   late final TextEditingController _notesController;
   late DateTime _selectedDate;
+  late bool _isCompleted;
   String? _selectedAccountId;
   String? _selectedDestinationAccountId;
   String? _selectedCategoryId;
@@ -44,12 +50,22 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
   bool _isDeleting = false;
   String? _errorMessage;
 
+  bool _isFutureDate(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final target = DateTime(date.year, date.month, date.day);
+    return target.isAfter(today);
+  }
+
   @override
   void initState() {
     super.initState();
     final tx = widget.transaction;
     _selectedType = tx.type;
-    _amountController = TextEditingController(text: tx.amount.format(includeSymbol: false));
+    _isCompleted = tx.isCompleted;
+    _amountController = TextEditingController(
+      text: tx.amount.format(includeSymbol: false),
+    );
     _descController = TextEditingController(text: tx.description);
     _notesController = TextEditingController(text: tx.notes ?? '');
     _selectedDate = tx.date;
@@ -68,37 +84,67 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
 
   Future<void> _handleSave() async {
     final parsed = Money.tryParse(_amountController.text);
-    if (parsed == null || !parsed.isPositive || _descController.text.trim().isEmpty || _selectedAccountId == null) {
-      setState(() => _errorMessage = 'Preencha todos os campos obrigatórios corretamente.');
+    if (parsed == null ||
+        !parsed.isPositive ||
+        _descController.text.trim().isEmpty ||
+        _selectedAccountId == null) {
+      setState(
+        () => _errorMessage =
+            'Preencha todos os campos obrigatórios corretamente.',
+      );
       return;
     }
-    setState(() { _isLoading = true; _errorMessage = null; });
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
     final updated = widget.transaction.copyWith(
       type: _selectedType,
       amount: parsed,
       description: _descController.text.trim(),
       date: _selectedDate,
+      status: _isCompleted
+          ? TransactionStatus.completed
+          : TransactionStatus.pending,
       accountId: _selectedAccountId,
-      destinationAccountId: _selectedType == TransactionType.transfer ? _selectedDestinationAccountId : null,
-      categoryId: _selectedType != TransactionType.transfer ? _selectedCategoryId : null,
-      notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+      destinationAccountId: _selectedType == TransactionType.transfer
+          ? _selectedDestinationAccountId
+          : null,
+      categoryId: _selectedType != TransactionType.transfer
+          ? _selectedCategoryId
+          : null,
+      notes: _notesController.text.trim().isEmpty
+          ? null
+          : _notesController.text.trim(),
       updatedAt: DateTime.now(),
     );
-    final res = await ref.read(transactionsListProvider.notifier).updateTransaction(updated);
+    final res = await ref
+        .read(transactionsListProvider.notifier)
+        .updateTransaction(updated);
     if (!mounted) return;
     setState(() => _isLoading = false);
-    if (res.isSuccess) { Navigator.of(context).pop(true); } else {
-      setState(() => _errorMessage = res.failureOrNull?.message ?? 'Erro ao salvar.');
+    if (res.isSuccess) {
+      Navigator.of(context).pop(true);
+    } else {
+      setState(
+        () => _errorMessage = res.failureOrNull?.message ?? 'Erro ao salvar.',
+      );
     }
   }
 
   Future<void> _handleDelete() async {
     setState(() => _isDeleting = true);
-    final res = await ref.read(transactionsListProvider.notifier).deleteTransaction(widget.transaction.id);
+    final res = await ref
+        .read(transactionsListProvider.notifier)
+        .deleteTransaction(widget.transaction.id);
     if (!mounted) return;
     setState(() => _isDeleting = false);
-    if (res.isSuccess) { Navigator.of(context).pop(true); } else {
-      setState(() => _errorMessage = res.failureOrNull?.message ?? 'Erro ao excluir.');
+    if (res.isSuccess) {
+      Navigator.of(context).pop(true);
+    } else {
+      setState(
+        () => _errorMessage = res.failureOrNull?.message ?? 'Erro ao excluir.',
+      );
     }
   }
 
@@ -106,24 +152,44 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
   Widget build(BuildContext context) {
     final accounts = ref.watch(accountsListProvider).value ?? const [];
     final categories = ref.watch(categoriesListProvider).value ?? const [];
-    final filteredCategories = categories.where((c) => _selectedType == TransactionType.income ? c.type == CategoryType.income : c.type == CategoryType.expense).toList();
+    final filteredCategories = categories
+        .where(
+          (c) => _selectedType == TransactionType.income
+              ? c.type == CategoryType.income
+              : c.type == CategoryType.expense,
+        )
+        .toList();
 
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            EditTransactionHeader(onDelete: _handleDelete, isDeleting: _isDeleting),
+            EditTransactionHeader(
+              onDelete: _handleDelete,
+              isDeleting: _isDeleting,
+            ),
             const SizedBox(height: 12),
-            TransactionTypeSegmentedTab(selectedType: _selectedType, onTypeChanged: (t) => setState(() => _selectedType = t)),
+            TransactionTypeSegmentedTab(
+              selectedType: _selectedType,
+              onTypeChanged: (t) => setState(() => _selectedType = t),
+            ),
             const SizedBox(height: 16),
-            TransactionAmountHeroInput(controller: _amountController, transactionType: _selectedType),
+            TransactionAmountHeroInput(
+              controller: _amountController,
+              transactionType: _selectedType,
+            ),
             if (_errorMessage != null) ...[
               const SizedBox(height: 12),
-              Text(_errorMessage!, style: const TextStyle(color: AppColors.expense, fontSize: 13)),
+              Text(
+                _errorMessage!,
+                style: const TextStyle(color: AppColors.expense, fontSize: 13),
+              ),
             ],
             const SizedBox(height: 16),
             EditTransactionFields(
@@ -136,17 +202,42 @@ class _EditTransactionSheetState extends ConsumerState<EditTransactionSheet> {
               selectedDestinationAccountId: _selectedDestinationAccountId,
               selectedCategoryId: _selectedCategoryId,
               onAccountChanged: (v) => setState(() => _selectedAccountId = v),
-              onDestinationAccountChanged: (v) => setState(() => _selectedDestinationAccountId = v),
+              onDestinationAccountChanged: (v) =>
+                  setState(() => _selectedDestinationAccountId = v),
               onCategoryChanged: (v) => setState(() => _selectedCategoryId = v),
             ),
             const SizedBox(height: 14),
-            TransactionDatePickerField(selectedDate: _selectedDate, onDateSelected: (d) => setState(() => _selectedDate = d)),
+            TransactionDatePickerField(
+              selectedDate: _selectedDate,
+              onDateSelected: (d) => setState(() {
+                _selectedDate = d;
+                if (_isFutureDate(d) &&
+                    !_isFutureDate(widget.transaction.date)) {
+                  _isCompleted = false;
+                }
+              }),
+            ),
+            const SizedBox(height: 14),
+            TransactionStatusToggle(
+              isCompleted: _isCompleted,
+              isFutureDate: _isFutureDate(_selectedDate),
+              type: _selectedType,
+              onChanged: (val) => setState(() => _isCompleted = val),
+            ),
             const SizedBox(height: 16),
             const EditTransactionHintBanner(),
             const SizedBox(height: 20),
-            AppButton(key: const Key('edit_transaction_submit_button'), label: 'Salvar alterações', isLoading: _isLoading, onPressed: _handleSave),
+            AppButton(
+              key: const Key('edit_transaction_submit_button'),
+              label: 'Salvar alterações',
+              isLoading: _isLoading,
+              onPressed: _handleSave,
+            ),
             const SizedBox(height: 10),
-            AppButton.outlined(label: 'Cancelar', onPressed: () => Navigator.of(context).pop(false)),
+            AppButton.outlined(
+              label: 'Cancelar',
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
             const SizedBox(height: 12),
           ],
         ),

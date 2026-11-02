@@ -7,6 +7,7 @@ import 'package:meusaldo/features/categories/presentation/state/category_provide
 import 'package:meusaldo/features/transactions/presentation/state/transaction_providers.dart';
 import 'package:meusaldo/features/transactions/presentation/widgets/transaction_amount_hero_input.dart';
 import 'package:meusaldo/features/transactions/presentation/widgets/transaction_date_picker_field.dart';
+import 'package:meusaldo/features/transactions/presentation/widgets/transaction_status_toggle.dart';
 import 'package:meusaldo/features/transactions/presentation/widgets/transaction_type_segmented_tab.dart';
 import 'package:meusaldo/shared/widgets/app_bottom_sheet.dart';
 import 'package:meusaldo/shared/widgets/app_button.dart';
@@ -55,6 +56,7 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
   late final TextEditingController _descController;
   late final TextEditingController _notesController;
   DateTime _selectedDate = DateTime.now();
+  late bool _isCompleted;
 
   String? _selectedAccountId;
   String? _selectedDestinationAccountId;
@@ -66,11 +68,23 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
   bool _isLoading = false;
   String? _errorMessage;
 
+  bool _isFutureDate(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final target = DateTime(date.year, date.month, date.day);
+    return target.isAfter(today);
+  }
+
+  bool get _isCard =>
+      _selectedType == TransactionType.expense &&
+      _paymentMethod == ExpensePaymentMethod.creditCard;
+
   @override
   void initState() {
     super.initState();
     _selectedType = widget.initialType;
     _selectedAccountId = widget.initialAccountId;
+    _isCompleted = !_isFutureDate(_selectedDate);
     _amountController = TextEditingController();
     _descController = TextEditingController();
     _notesController = TextEditingController();
@@ -97,7 +111,8 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
       return;
     }
 
-    final isCard = _selectedType == TransactionType.expense &&
+    final isCard =
+        _selectedType == TransactionType.expense &&
         _paymentMethod == ExpensePaymentMethod.creditCard;
 
     if (isCard) {
@@ -131,8 +146,11 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
     final notifier = ref.read(transactionsListProvider.notifier);
 
     if (_selectedType == TransactionType.transfer) {
-      final effectiveDesc =
-          desc.isEmpty ? 'Transferência entre contas' : desc;
+      final effectiveDesc = desc.isEmpty ? 'Transferência entre contas' : desc;
+      final effectiveStatus = _isCompleted
+          ? TransactionStatus.completed
+          : TransactionStatus.pending;
+
       final result = await notifier.executeTransfer(
         transactionId: 'tx_${DateTime.now().millisecondsSinceEpoch}',
         sourceAccountId: _selectedAccountId!,
@@ -140,6 +158,7 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
         amount: amount,
         date: _selectedDate,
         description: effectiveDesc,
+        status: effectiveStatus,
         notes: _notesController.text.trim().isNotEmpty
             ? _notesController.text.trim()
             : null,
@@ -151,15 +170,21 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
       } else {
         setState(() {
           _isLoading = false;
-          _errorMessage =
-              result.failureOrNull?.message ?? 'Erro ao transferir';
+          _errorMessage = result.failureOrNull?.message ?? 'Erro ao transferir';
         });
       }
     } else {
       final accounts = ref.read(accountsListProvider).value ?? const [];
       final effectiveAccountId = isCard
-          ? (_selectedAccountId ?? (accounts.isNotEmpty ? accounts.first.id : 'acc-default'))
+          ? (_selectedAccountId ??
+                (accounts.isNotEmpty ? accounts.first.id : 'acc-default'))
           : _selectedAccountId!;
+
+      final effectiveStatus = isCard
+          ? TransactionStatus.completed
+          : (_isCompleted
+                ? TransactionStatus.completed
+                : TransactionStatus.pending);
 
       final newTx = Transaction.create(
         id: 'tx_${DateTime.now().millisecondsSinceEpoch}',
@@ -167,6 +192,7 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
         amount: amount,
         date: _selectedDate,
         type: _selectedType,
+        status: effectiveStatus,
         accountId: effectiveAccountId,
         cardId: isCard ? _selectedCardId : null,
         installments: isCard ? _selectedInstallments : null,
@@ -238,8 +264,8 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
                 Text(
                   'Novo lançamento',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close, color: AppColors.textSecondary),
@@ -273,7 +299,10 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
                 ),
                 child: Text(
                   _errorMessage!,
-                  style: const TextStyle(color: AppColors.expense, fontSize: 13),
+                  style: const TextStyle(
+                    color: AppColors.expense,
+                    fontSize: 13,
+                  ),
                 ),
               ),
               const SizedBox(height: 14),
@@ -282,8 +311,8 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
             Text(
               'Descrição *',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 6),
             TextField(
@@ -302,8 +331,8 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
               Text(
                 'Conta de origem *',
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: 6),
               _buildAccountDropdown(
@@ -314,8 +343,10 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
               const SizedBox(height: 10),
               Center(
                 child: IconButton(
-                  icon: const Icon(Icons.swap_vert,
-                      color: AppColors.primaryHighlight),
+                  icon: const Icon(
+                    Icons.swap_vert,
+                    color: AppColors.primaryHighlight,
+                  ),
                   tooltip: 'Inverter contas',
                   onPressed: () {
                     setState(() {
@@ -329,8 +360,8 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
               Text(
                 'Conta de destino *',
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: 6),
               _buildAccountDropdown(
@@ -344,8 +375,8 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
                 Text(
                   'Forma de pagamento *',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Container(
@@ -361,8 +392,11 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
                         child: _buildPaymentMethodOption(
                           label: 'Conta Bancária',
                           icon: Icons.account_balance,
-                          isSelected: _paymentMethod == ExpensePaymentMethod.account,
-                          onTap: () => setState(() => _paymentMethod = ExpensePaymentMethod.account),
+                          isSelected:
+                              _paymentMethod == ExpensePaymentMethod.account,
+                          onTap: () => setState(
+                            () => _paymentMethod = ExpensePaymentMethod.account,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 4),
@@ -370,7 +404,8 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
                         child: _buildPaymentMethodOption(
                           label: 'Cartão de Crédito',
                           icon: Icons.credit_card,
-                          isSelected: _paymentMethod == ExpensePaymentMethod.creditCard,
+                          isSelected:
+                              _paymentMethod == ExpensePaymentMethod.creditCard,
                           onTap: () => setState(() {
                             _paymentMethod = ExpensePaymentMethod.creditCard;
                             if (_selectedCardId == null && cards.isNotEmpty) {
@@ -389,8 +424,8 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
                 Text(
                   'Cartão de crédito *',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 _buildCardDropdown(
@@ -402,14 +437,17 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
                 Text(
                   'Parcelamento',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 _buildInstallmentsDropdown(
                   selectedInstallments: _selectedInstallments,
-                  amount: Money.tryParse(_amountController.text) ?? const Money.zero(),
-                  onChanged: (val) => setState(() => _selectedInstallments = val ?? 1),
+                  amount:
+                      Money.tryParse(_amountController.text) ??
+                      const Money.zero(),
+                  onChanged: (val) =>
+                      setState(() => _selectedInstallments = val ?? 1),
                 ),
                 const SizedBox(height: 14),
               ] else ...[
@@ -418,8 +456,8 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
                       ? 'Conta de débito *'
                       : 'Conta de crédito *',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 _buildAccountDropdown(
@@ -433,8 +471,8 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
               Text(
                 'Categoria',
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: 6),
               DropdownButtonFormField<String>(
@@ -459,8 +497,20 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
             // Data
             TransactionDatePickerField(
               selectedDate: _selectedDate,
-              onDateSelected: (d) => setState(() => _selectedDate = d),
+              onDateSelected: (d) => setState(() {
+                _selectedDate = d;
+                _isCompleted = !_isFutureDate(d);
+              }),
             ),
+            if (!_isCard) ...[
+              const SizedBox(height: 14),
+              TransactionStatusToggle(
+                isCompleted: _isCompleted,
+                isFutureDate: _isFutureDate(_selectedDate),
+                type: _selectedType,
+                onChanged: (val) => setState(() => _isCompleted = val),
+              ),
+            ],
             const SizedBox(height: 24),
 
             // Botão Salvar
@@ -541,8 +591,9 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
         prefixIcon: Icon(Icons.credit_card, size: 20),
       ),
       items: cards.map((card) {
-        final digits =
-            card.lastFourDigits != null ? ' (Final ${card.lastFourDigits})' : '';
+        final digits = card.lastFourDigits != null
+            ? ' (Final ${card.lastFourDigits})'
+            : '';
         return DropdownMenuItem(
           value: card.id,
           child: Text('${card.name}$digits'),
@@ -574,8 +625,9 @@ class _TransactionFormSheetState extends ConsumerState<TransactionFormSheet> {
         }
         final installmentCents = (amount.cents / n).round();
         final installmentMoney = Money.fromCents(installmentCents);
-        final valText =
-            amount.isPositive ? ' (${installmentMoney.format()} /mês)' : '';
+        final valText = amount.isPositive
+            ? ' (${installmentMoney.format()} /mês)'
+            : '';
         return DropdownMenuItem(
           value: n,
           child: Text('${n}x parcelado$valText'),

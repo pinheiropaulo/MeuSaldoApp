@@ -38,6 +38,81 @@ class TransactionDetailsSheet extends ConsumerStatefulWidget {
 class _TransactionDetailsSheetState
     extends ConsumerState<TransactionDetailsSheet> {
   bool _isDeleting = false;
+  bool _isConfirming = false;
+
+  Future<void> _handleConfirmCompletion() async {
+    final tx = widget.transaction;
+    final actionLabel = switch (tx.type) {
+      TransactionType.income => 'recebimento',
+      TransactionType.expense => 'pagamento',
+      TransactionType.transfer => 'transferência',
+    };
+
+    final title = switch (tx.type) {
+      TransactionType.income => 'Confirmar recebimento?',
+      TransactionType.expense => 'Confirmar pagamento?',
+      TransactionType.transfer => 'Confirmar transferência?',
+    };
+
+    final message = switch (tx.type) {
+      TransactionType.income =>
+        'Confirmar o recebimento de ${tx.amount.format()}? O saldo da conta será creditado agora.',
+      TransactionType.expense =>
+        'Confirmar o pagamento de ${tx.amount.format()}? O saldo da conta será debitado agora.',
+      TransactionType.transfer =>
+        'Confirmar a transferência de ${tx.amount.format()}? Os saldos das contas serão atualizados agora.',
+    };
+
+    final confirmed = await showAppConfirmationDialog(
+      context: context,
+      title: title,
+      message: message,
+      confirmLabel: 'Confirmar $actionLabel',
+    );
+
+    if (confirmed && mounted) {
+      setState(() => _isConfirming = true);
+      final updated = tx.copyWith(
+        status: TransactionStatus.completed,
+        updatedAt: DateTime.now(),
+      );
+
+      final result = await ref
+          .read(transactionsListProvider.notifier)
+          .updateTransaction(updated);
+
+      if (mounted) {
+        setState(() => _isConfirming = false);
+        if (result.isSuccess) {
+          Navigator.of(context).pop(true);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                switch (tx.type) {
+                  TransactionType.income =>
+                    'Receita de ${tx.amount.format()} recebida com sucesso!',
+                  TransactionType.expense =>
+                    'Pagamento de ${tx.amount.format()} confirmado com sucesso!',
+                  TransactionType.transfer =>
+                    'Transferência de ${tx.amount.format()} efetivada com sucesso!',
+                },
+              ),
+              backgroundColor: AppColors.income,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                result.failureOrNull?.message ?? 'Erro ao efetivar lançamento',
+              ),
+              backgroundColor: AppColors.expense,
+            ),
+          );
+        }
+      }
+    }
+  }
 
   Future<void> _handleDelete() async {
     final confirmed = await showAppConfirmationDialog(
@@ -92,16 +167,16 @@ class _TransactionDetailsSheetState
 
     final destAccountName = tx.destinationAccountId != null
         ? accounts
-            .where((a) => a.id == tx.destinationAccountId)
-            .map((a) => a.name)
-            .firstOrNull
+              .where((a) => a.id == tx.destinationAccountId)
+              .map((a) => a.name)
+              .firstOrNull
         : null;
 
     final categoryName = tx.categoryId != null
         ? categories
-            .where((c) => c.id == tx.categoryId)
-            .map((c) => c.name)
-            .firstOrNull
+              .where((c) => c.id == tx.categoryId)
+              .map((c) => c.name)
+              .firstOrNull
         : null;
 
     return Padding(
@@ -121,8 +196,8 @@ class _TransactionDetailsSheetState
                 Text(
                   'Detalhes do lançamento',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close, color: AppColors.textSecondary),
@@ -239,8 +314,9 @@ class _TransactionDetailsSheetState
                   _InfoRow(
                     label: 'Status',
                     value: tx.isCompleted ? 'Efetivado' : 'Pendente',
-                    valueColor:
-                        tx.isCompleted ? AppColors.income : AppColors.alert,
+                    valueColor: tx.isCompleted
+                        ? AppColors.income
+                        : AppColors.alert,
                   ),
                   if (tx.notes != null && tx.notes!.isNotEmpty) ...[
                     const Divider(color: AppColors.outline, height: 16),
@@ -253,6 +329,22 @@ class _TransactionDetailsSheetState
               ),
             ),
             const SizedBox(height: 24),
+
+            // Botão Confirmar Recebimento / Pagamento (apenas se Pendente)
+            if (tx.isPending) ...[
+              AppButton(
+                key: const Key('details_confirm_completion_button'),
+                label: switch (tx.type) {
+                  TransactionType.income => 'Confirmar recebimento',
+                  TransactionType.expense => 'Confirmar pagamento',
+                  TransactionType.transfer => 'Confirmar transferência',
+                },
+                icon: Icons.check_circle_outline,
+                isLoading: _isConfirming,
+                onPressed: _handleConfirmCompletion,
+              ),
+              const SizedBox(height: 10),
+            ],
 
             // Botão Editar
             AppButton(
