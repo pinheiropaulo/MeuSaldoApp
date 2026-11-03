@@ -15,6 +15,7 @@ final creditCardRepositoryProvider = Provider<CreditCardRepository>((ref) {
       return SupabaseCardRepository(client: client);
     } catch (_) {
       // Supabase não inicializado (ex: testes de widget isolados)
+      return InMemoryCreditCardRepository.withDemoData();
     }
   }
   return InMemoryCreditCardRepository();

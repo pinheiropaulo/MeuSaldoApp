@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:meusaldo/shared/data/demo_data.dart';
 import 'package:meusaldo_core/meusaldo_core.dart';
 
 /// Filtros de visualização para lançamentos recorrentes.
@@ -42,7 +41,7 @@ final recurringFilterProvider =
 class RecurringListNotifier extends Notifier<List<RecurringTransaction>> {
   @override
   List<RecurringTransaction> build() {
-    return DemoData.getRecurringTransactions();
+    return const [];
   }
 
   /// Alterna o status ativo/pausado de uma recorrência.

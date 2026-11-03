@@ -15,6 +15,7 @@ final accountRepositoryProvider = Provider<AccountRepository>((ref) {
       return SupabaseAccountRepository(client: client);
     } catch (_) {
       // Supabase não inicializado (ex: testes de widget isolados)
+      return InMemoryAccountRepository.withDemoData();
     }
   }
   return InMemoryAccountRepository();

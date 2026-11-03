@@ -6,16 +6,21 @@ import 'package:meusaldo/app/theme/theme.dart';
 import 'package:meusaldo/features/accounts/data/in_memory_account_repository.dart';
 import 'package:meusaldo/features/accounts/presentation/state/account_providers.dart';
 import 'package:meusaldo/features/accounts/presentation/widgets/account_form_sheet.dart';
+import 'package:meusaldo/features/cards/data/in_memory_credit_card_repository.dart';
+import 'package:meusaldo/features/cards/presentation/state/card_providers.dart';
 import 'package:meusaldo/features/home/presentation/screens/home_screen.dart';
+import 'package:meusaldo/features/home/presentation/state/home_providers.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_accounts_section.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_balance_card.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_first_account_banner.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_header.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_quick_actions.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_upcoming_alert.dart';
+import 'package:meusaldo/features/transactions/data/in_memory_transaction_repository.dart';
+import 'package:meusaldo/features/transactions/presentation/state/transaction_providers.dart';
 import 'package:meusaldo/features/transactions/presentation/widgets/transaction_form_sheet.dart';
 
-Widget _buildTestApp({GoRouter? router}) {
+Widget _buildTestApp({GoRouter? router, UpcomingAlertData? upcomingAlert}) {
   final effectiveRouter = router ??
       GoRouter(
         initialLocation: '/',
@@ -43,6 +48,17 @@ Widget _buildTestApp({GoRouter? router}) {
       );
 
   return ProviderScope(
+    overrides: [
+      homeUpcomingAlertProvider.overrideWithValue(
+        upcomingAlert ??
+            const UpcomingAlertData(
+              title: 'Fatura Nubank fecha em 3 dias',
+              description:
+                  'Estimativa atual de R\$ 2.348,70. Revise os lançamentos antes do fechamento.',
+              badgeText: '3 dias',
+            ),
+      ),
+    ],
     child: MaterialApp.router(
       theme: AppTheme.darkTheme,
       routerConfig: effectiveRouter,
@@ -163,6 +179,12 @@ void main() {
             accountRepositoryProvider.overrideWithValue(
               InMemoryAccountRepository(initialAccounts: const []),
             ),
+            transactionRepositoryProvider.overrideWithValue(
+              InMemoryTransactionRepository(initialTransactions: const []),
+            ),
+            creditCardRepositoryProvider.overrideWithValue(
+              InMemoryCreditCardRepository(initialCards: const []),
+            ),
           ],
           child: MaterialApp(
             theme: AppTheme.darkTheme,
@@ -176,6 +198,9 @@ void main() {
       expect(find.byType(HomeFirstAccountBanner), findsOneWidget);
       expect(find.text('Bem-vindo ao MeuSaldo! 👋'), findsOneWidget);
       expect(find.byKey(const Key('home_create_first_account_button')), findsOneWidget);
+
+      // Não exibe alerta de compromisso/fatura fake para novos usuários
+      expect(find.byType(HomeUpcomingAlert), findsNothing);
 
       // Verifica que o modal de cadastro de conta foi acionado automaticamente
       expect(find.byType(AccountFormSheet), findsOneWidget);

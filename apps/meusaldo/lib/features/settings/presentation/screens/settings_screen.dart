@@ -55,7 +55,7 @@ class SettingsScreen extends ConsumerWidget {
                         style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                       ),
                       Text(
-                        user?.email ?? 'usuario@email.com',
+                        user?.email ?? 'Sem e-mail cadastrado',
                         style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
                       ),
                     ],

@@ -5,6 +5,7 @@ import 'package:meusaldo/app/routing/app_routes.dart';
 import 'package:meusaldo/app/theme/theme.dart';
 import 'package:meusaldo/features/accounts/presentation/state/account_providers.dart';
 import 'package:meusaldo/features/accounts/presentation/widgets/account_form_sheet.dart';
+import 'package:meusaldo/features/auth/presentation/state/auth_providers.dart';
 import 'package:meusaldo/features/home/presentation/state/home_providers.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_accounts_section.dart';
 import 'package:meusaldo/features/home/presentation/widgets/home_balance_card.dart';
@@ -22,6 +23,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authStateProvider).value;
     final accountsAsync = ref.watch(accountsListProvider);
     final accounts = accountsAsync.value ?? const [];
     final hasNoAccounts = accountsAsync.hasValue && accounts.isEmpty;
@@ -29,6 +31,7 @@ class HomeScreen extends ConsumerWidget {
     final monthlyIncome = ref.watch(currentMonthIncomeTotalProvider);
     final monthlyExpenses = ref.watch(currentMonthExpensesTotalProvider);
     final isBalanceVisible = ref.watch(isBalanceVisibleProvider);
+    final upcomingAlert = ref.watch(homeUpcomingAlertProvider);
 
     // No primeiro acesso (quando o usuário não possui contas),
     // aciona a tela para cadastrar sua primeira conta.
@@ -91,7 +94,7 @@ class HomeScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           children: [
-            const HomeHeader(),
+            HomeHeader(userName: user?.name ?? 'Usuário'),
             const SizedBox(height: 18),
             if (hasNoAccounts) ...[
               HomeFirstAccountBanner(
@@ -123,10 +126,13 @@ class HomeScreen extends ConsumerWidget {
                 initialType: TransactionType.transfer,
               ),
             ),
-            const SizedBox(height: 22),
-            HomeUpcomingAlert(
-              onScheduleTap: () => context.go(AppRoutes.cards),
-            ),
+            if (upcomingAlert != null) ...[
+              const SizedBox(height: 22),
+              HomeUpcomingAlert(
+                alert: upcomingAlert,
+                onScheduleTap: () => context.go(AppRoutes.cards),
+              ),
+            ],
             const SizedBox(height: 22),
             HomeAccountsSection(
               accounts: accounts,

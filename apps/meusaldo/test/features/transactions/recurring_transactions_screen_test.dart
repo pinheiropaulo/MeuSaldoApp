@@ -138,5 +138,14 @@ void main() {
       expect(find.text('Descrição do Lançamento'), findsOneWidget);
       expect(find.text('Salvar Recorrência'), findsOneWidget);
     });
+
+    testWidgets('exibe estado vazio por padrão quando não há recorrências cadastradas', (tester) async {
+      await tester.pumpWidget(buildScreen());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Nenhuma recorrência encontrada'), findsOneWidget);
+      expect(find.text('Cadastre assinaturas e despesas fixas para monitorar seu comprometimento mensal.'), findsOneWidget);
+      expect(find.text('Netflix Brasil'), findsNothing);
+    });
   });
 }

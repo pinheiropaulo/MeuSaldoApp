@@ -59,7 +59,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(UserProfileBentoCard), findsOneWidget);
-      expect(find.text('Paulo Pinheiro'), findsOneWidget);
+      expect(find.text('Paulo'), findsOneWidget);
       expect(find.text('paulo@meusaldo.app'), findsOneWidget);
       expect(find.text('Editar'), findsOneWidget);
 

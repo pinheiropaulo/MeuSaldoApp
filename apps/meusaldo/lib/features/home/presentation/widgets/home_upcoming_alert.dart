@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:meusaldo/app/theme/theme.dart';
+import 'package:meusaldo/features/home/presentation/state/home_providers.dart';
 
 /// Card de alerta de compromisso financeiro próximo (ex: fechamento de fatura ou conta a vencer).
 class HomeUpcomingAlert extends StatelessWidget {
+  /// Dados do compromisso a ser exibido.
+  final UpcomingAlertData alert;
+
   /// Callback ao acionar visualização da agenda.
   final VoidCallback? onScheduleTap;
 
   const HomeUpcomingAlert({
     super.key,
+    required this.alert,
     this.onScheduleTap,
   });
 
@@ -51,8 +56,8 @@ class HomeUpcomingAlert extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
-                Icons.credit_card,
+              Icon(
+                alert.icon,
                 size: 22,
                 color: AppColors.alert,
               ),
@@ -61,9 +66,9 @@ class HomeUpcomingAlert extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Fatura Nubank fecha em 3 dias',
-                      style: TextStyle(
+                    Text(
+                      alert.title,
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -71,7 +76,7 @@ class HomeUpcomingAlert extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Estimativa atual de R\$ 2.348,70. Revise os lançamentos antes do fechamento.',
+                      alert.description,
                       style: TextStyle(
                         fontSize: 12,
                         color: const Color(0xFFE1D2AE).withValues(alpha: 0.9),
@@ -89,9 +94,9 @@ class HomeUpcomingAlert extends StatelessWidget {
                   color: AppColors.alert.withValues(alpha: 0.17),
                   borderRadius: BorderRadius.circular(99),
                 ),
-                child: const Text(
-                  '3 dias',
-                  style: TextStyle(
+                child: Text(
+                  alert.badgeText,
+                  style: const TextStyle(
                     color: AppColors.alert,
                     fontWeight: FontWeight.w700,
                     fontSize: 11,

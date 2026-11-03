@@ -1,3 +1,4 @@
+import 'package:meusaldo/app/config/app_config.dart';
 import 'package:meusaldo/shared/data/demo_data.dart';
 import 'package:meusaldo_core/meusaldo_core.dart';
 
@@ -12,13 +13,16 @@ class InMemoryCreditCardRepository implements CreditCardRepository {
     List<Invoice>? initialInvoices,
     List<CardExpense>? initialExpenses,
   }) {
-    final seedCards = initialCards ?? const [];
+    final seedCards = initialCards ??
+        (AppConfig.isSupabaseConfigured ? const [] : DemoData.creditCards);
     for (final card in seedCards) {
       _cards[card.id] = card;
     }
 
-    _invoices.addAll(initialInvoices ?? const []);
-    _expenses.addAll(initialExpenses ?? const []);
+    _invoices.addAll(initialInvoices ??
+        (AppConfig.isSupabaseConfigured ? const [] : DemoData.getInvoices()));
+    _expenses.addAll(initialExpenses ??
+        (AppConfig.isSupabaseConfigured ? const [] : DemoData.getCardExpenses()));
   }
 
   /// Construtor de demonstração para testes que necessitam de dados mockados prévios.

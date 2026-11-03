@@ -17,6 +17,7 @@ final transactionRepositoryProvider = Provider<TransactionRepository>((ref) {
       return SupabaseTransactionRepository(client: client);
     } catch (_) {
       // Supabase não inicializado (ex: testes de widget isolados)
+      return InMemoryTransactionRepository.withDemoData();
     }
   }
   return InMemoryTransactionRepository();

@@ -1,3 +1,4 @@
+import 'package:meusaldo/app/config/app_config.dart';
 import 'package:meusaldo/shared/data/demo_data.dart';
 import 'package:meusaldo_core/meusaldo_core.dart';
 
@@ -6,10 +7,16 @@ class InMemoryCategoryRepository implements CategoryRepository {
   final Map<String, Category> _categories = {};
 
   InMemoryCategoryRepository({List<Category>? initialCategories}) {
-    final seed = initialCategories ?? DemoData.categories;
+    final seed = initialCategories ??
+        (AppConfig.isSupabaseConfigured ? const [] : DemoData.categories);
     for (final cat in seed) {
       _categories[cat.id] = cat;
     }
+  }
+
+  /// Construtor de fábrica para testes com massa de dados de demonstração.
+  factory InMemoryCategoryRepository.withDemoData() {
+    return InMemoryCategoryRepository(initialCategories: DemoData.categories);
   }
 
   @override

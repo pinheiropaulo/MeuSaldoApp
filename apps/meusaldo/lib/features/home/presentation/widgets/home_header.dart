@@ -8,7 +8,7 @@ class HomeHeader extends StatelessWidget {
 
   const HomeHeader({
     super.key,
-    this.userName = 'Paulo',
+    this.userName = 'Usuário',
   });
 
   static const _monthNames = [
@@ -28,9 +28,11 @@ class HomeHeader extends StatelessWidget {
 
   String _getGreeting() {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'Bom dia, $userName';
-    if (hour < 18) return 'Boa tarde, $userName';
-    return 'Boa noite, $userName';
+    final firstName = userName.trim().split(' ').first;
+    final displayName = firstName.isNotEmpty ? firstName : 'Usuário';
+    if (hour < 12) return 'Bom dia, $displayName';
+    if (hour < 18) return 'Boa tarde, $displayName';
+    return 'Boa noite, $displayName';
   }
 
   String _getCurrentMonthName() {

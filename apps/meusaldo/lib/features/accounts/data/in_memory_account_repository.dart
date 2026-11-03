@@ -1,3 +1,4 @@
+import 'package:meusaldo/app/config/app_config.dart';
 import 'package:meusaldo/shared/data/demo_data.dart';
 import 'package:meusaldo_core/meusaldo_core.dart';
 
@@ -6,10 +7,16 @@ class InMemoryAccountRepository implements AccountRepository {
   final Map<String, FinancialAccount> _accounts = {};
 
   InMemoryAccountRepository({List<FinancialAccount>? initialAccounts}) {
-    final seed = initialAccounts ?? DemoData.accounts;
+    final seed = initialAccounts ??
+        (AppConfig.isSupabaseConfigured ? const [] : DemoData.accounts);
     for (final acc in seed) {
       _accounts[acc.id] = acc;
     }
+  }
+
+  /// Construtor de fábrica para testes com massa de dados de demonstração.
+  factory InMemoryAccountRepository.withDemoData() {
+    return InMemoryAccountRepository(initialAccounts: DemoData.accounts);
   }
 
   @override

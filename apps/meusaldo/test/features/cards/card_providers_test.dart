@@ -12,8 +12,8 @@ void main() {
       repository = InMemoryCreditCardRepository.withDemoData();
     });
 
-    test('construtor padrão inicializa com listas vazias', () async {
-      final emptyRepo = InMemoryCreditCardRepository();
+    test('construtor com listas vazias inicializa vazio', () async {
+      final emptyRepo = InMemoryCreditCardRepository(initialCards: const []);
       final result = await emptyRepo.getAll();
       expect(result.isSuccess, isTrue);
       expect(result.valueOrNull!, isEmpty);

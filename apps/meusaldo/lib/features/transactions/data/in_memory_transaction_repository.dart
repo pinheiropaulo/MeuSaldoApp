@@ -1,3 +1,4 @@
+import 'package:meusaldo/app/config/app_config.dart';
 import 'package:meusaldo/shared/data/demo_data.dart';
 import 'package:meusaldo_core/meusaldo_core.dart';
 
@@ -6,10 +7,18 @@ class InMemoryTransactionRepository implements TransactionRepository {
   final Map<String, Transaction> _transactions = {};
 
   InMemoryTransactionRepository({List<Transaction>? initialTransactions}) {
-    final seed = initialTransactions ?? DemoData.getTransactions();
+    final seed = initialTransactions ??
+        (AppConfig.isSupabaseConfigured ? const [] : DemoData.getTransactions());
     for (final tx in seed) {
       _transactions[tx.id] = tx;
     }
+  }
+
+  /// Construtor de fábrica para testes com massa de dados de demonstração.
+  factory InMemoryTransactionRepository.withDemoData() {
+    return InMemoryTransactionRepository(
+      initialTransactions: DemoData.getTransactions(),
+    );
   }
 
   @override

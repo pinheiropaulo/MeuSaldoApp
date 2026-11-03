@@ -15,6 +15,7 @@ final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {
       return SupabaseCategoryRepository(client: client);
     } catch (_) {
       // Supabase não inicializado (ex: testes de widget isolados)
+      return InMemoryCategoryRepository.withDemoData();
     }
   }
   return InMemoryCategoryRepository();

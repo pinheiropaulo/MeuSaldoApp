@@ -18,7 +18,7 @@ class MoreScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authStateProvider).value;
     final categoriesAsync = ref.watch(categoriesListProvider);
-    final totalCategories = categoriesAsync.value?.length ?? 14;
+    final totalCategories = categoriesAsync.value?.length ?? 0;
 
     return Scaffold(
       appBar: AppBar(

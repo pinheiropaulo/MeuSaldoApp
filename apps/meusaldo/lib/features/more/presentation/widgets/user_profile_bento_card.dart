@@ -18,7 +18,8 @@ class UserProfileBentoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final displayName = name?.isNotEmpty == true ? name! : 'Usuário';
-    final displayEmail = email?.isNotEmpty == true ? email! : 'usuario@meusaldo.app';
+    final displayEmail =
+        email?.isNotEmpty == true ? email! : 'Sem e-mail cadastrado';
     final initial = displayName[0].toUpperCase();
 
     return AppCard(

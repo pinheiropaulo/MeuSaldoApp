@@ -22,9 +22,10 @@ class InMemoryAuthRepository implements AuthRepository {
       );
     }
 
-    final displayName = cleanEmail == 'paulo@meusaldo.app'
-        ? 'Paulo Pinheiro'
-        : cleanEmail.split('@').first;
+    final localPart = cleanEmail.split('@').first;
+    final displayName = localPart.isNotEmpty
+        ? localPart[0].toUpperCase() + localPart.substring(1)
+        : 'Usuário';
 
     _currentUser = User.create(
       id: 'usr-${cleanEmail.hashCode.abs()}',
@@ -97,7 +98,7 @@ class InMemoryAuthRepository implements AuthRepository {
       _currentUser = User.create(
         id: 'usr-default',
         name: cleanName,
-        email: 'paulo@meusaldo.app',
+        email: 'usuario@meusaldo.app',
         photoUrl: photoUrl,
         phone: phone,
       );
