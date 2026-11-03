@@ -286,3 +286,22 @@ $$ language plpgsql security definer;
 create or replace trigger on_auth_user_created
     after insert on auth.users
     for each row execute function public.handle_new_user();
+
+-- ==============================================================================
+-- 10. PERMISSÕES DE ACESSO (GRANTS) PARA POSTGREST / API DO SUPABASE
+-- ==============================================================================
+-- Garante que o PostgREST (API REST do Supabase) e os usuários autenticados
+-- possam consultar, inserir, atualizar e excluir registros respeitando o RLS.
+grant usage on schema public to anon, authenticated;
+
+-- Permissões em todas as tabelas e sequências atuais
+grant all on all tables in schema public to authenticated;
+grant all on all sequences in schema public to authenticated;
+
+-- Leitura básica para o papel anônimo (controlado por RLS)
+grant select on all tables in schema public to anon;
+
+-- Garante que futuras tabelas criadas no schema public herdem essas permissões
+alter default privileges in schema public grant all on tables to authenticated;
+alter default privileges in schema public grant all on sequences to authenticated;
+
