@@ -18,6 +18,7 @@ class AccountsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final accountsAsync = ref.watch(accountsListProvider);
     final consolidatedBalance = ref.watch(consolidatedBalanceProvider);
+    final benefitsBalance = ref.watch(benefitsBalanceProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -80,6 +81,7 @@ class AccountsScreen extends ConsumerWidget {
               children: [
                 AccountsHeaderSection(
                   consolidatedBalance: consolidatedBalance,
+                  benefitsBalance: benefitsBalance,
                   accountsCount: accounts.length,
                 ),
                 ...accounts.map(

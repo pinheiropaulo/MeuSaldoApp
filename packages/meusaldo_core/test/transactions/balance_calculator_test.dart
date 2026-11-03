@@ -91,9 +91,25 @@ void main() {
       expect(balanceB.cents, equals(9000)); // 50 + 40 = 90
     });
 
-    test('calcula saldo consolidado total das contas', () {
-      final total = calculator.calculateConsolidatedBalance([accountA, accountB]);
-      expect(total.cents, equals(15000)); // 100 + 50 = 150
+    test('calcula saldo consolidado total das contas excluindo benefícios por padrão', () {
+      final benefitAccount = FinancialAccount.create(
+        id: 'acc-vr',
+        name: 'Ifood Benefícios',
+        type: AccountType.benefit,
+        initialBalance: const Money.fromCents(89661),
+      );
+
+      final totalLiquid = calculator.calculateConsolidatedBalance([accountA, accountB, benefitAccount]);
+      expect(totalLiquid.cents, equals(15000)); // 100 + 50 = 150 (VR de 896,61 ignorado no saldo líquido)
+
+      final totalWithBenefits = calculator.calculateConsolidatedBalance(
+        [accountA, accountB, benefitAccount],
+        includeBenefits: true,
+      );
+      expect(totalWithBenefits.cents, equals(104661)); // 150,00 + 896,61 = 1046,61
+
+      final benefitsOnly = calculator.calculateBenefitsBalance([accountA, accountB, benefitAccount]);
+      expect(benefitsOnly.cents, equals(89661));
     });
 
     test('calcula totais agregados de receitas e despesas', () {

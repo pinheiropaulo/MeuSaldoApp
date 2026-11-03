@@ -144,7 +144,8 @@ GoRouter createRouter({
         path: AppRoutes.editAccount,
         builder: (context, state) {
           final accountId = state.pathParameters['id']!;
-          return EditAccountScreen(accountId: accountId);
+          final account = state.extra as FinancialAccount?;
+          return EditAccountScreen(accountId: accountId, account: account);
         },
       ),
       GoRoute(

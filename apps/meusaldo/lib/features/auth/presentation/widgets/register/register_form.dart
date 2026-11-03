@@ -81,126 +81,132 @@ class _RegisterFormState extends State<RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        // Campo 1: Nome Completo
-        const Text(
-          'Nome completo',
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 6),
-        TextField(
-          key: const Key('register_name_field'),
-          controller: _nameController,
-          textCapitalization: TextCapitalization.words,
-          decoration: const InputDecoration(
-            prefixIcon: Icon(Icons.person_outline, size: 20),
-            hintText: 'Como gostaria de ser chamado?',
-          ),
-        ),
-        const SizedBox(height: 14),
-
-        // Campo 2: E-mail
-        const Text(
-          'E-mail',
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 6),
-        TextField(
-          key: const Key('register_email_field'),
-          controller: _emailController,
-          keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(
-            prefixIcon: Icon(Icons.mail_outline, size: 20),
-            hintText: 'seu.email@exemplo.com',
-          ),
-        ),
-        const SizedBox(height: 14),
-
-        // Campo 3: Senha
-        const Text(
-          'Senha',
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 6),
-        TextField(
-          key: const Key('register_password_field'),
-          controller: _passwordController,
-          obscureText: _obscurePassword,
-          decoration: InputDecoration(
-            prefixIcon: const Icon(Icons.lock_outline, size: 20),
-            hintText: 'Crie uma senha forte',
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscurePassword
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-                size: 20,
-              ),
-              onPressed: () =>
-                  setState(() => _obscurePassword = !_obscurePassword),
+    return AutofillGroup(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Campo 1: Nome Completo
+          const Text(
+            'Nome completo',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimary,
             ),
           ),
-        ),
-        const SizedBox(height: 14),
-
-        // Campo 4: Confirmar Senha
-        const Text(
-          'Confirmar senha',
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
+          const SizedBox(height: 6),
+          TextField(
+            key: const Key('register_name_field'),
+            controller: _nameController,
+            textCapitalization: TextCapitalization.words,
+            autofillHints: const [AutofillHints.name],
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.person_outline, size: 20),
+              hintText: 'Como gostaria de ser chamado?',
+            ),
           ),
-        ),
-        const SizedBox(height: 6),
-        TextField(
-          key: const Key('register_confirm_password_field'),
-          controller: _confirmPasswordController,
-          obscureText: _obscureConfirmPassword,
-          decoration: InputDecoration(
-            prefixIcon: const Icon(Icons.lock_outline, size: 20),
-            hintText: 'Repita a senha criada',
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscureConfirmPassword
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-                size: 20,
-              ),
-              onPressed: () => setState(
-                () => _obscureConfirmPassword = !_obscureConfirmPassword,
+          const SizedBox(height: 14),
+
+          // Campo 2: E-mail
+          const Text(
+            'E-mail',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          TextField(
+            key: const Key('register_email_field'),
+            controller: _emailController,
+            keyboardType: TextInputType.emailAddress,
+            autofillHints: const [AutofillHints.email, AutofillHints.username],
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.mail_outline, size: 20),
+              hintText: 'seu.email@exemplo.com',
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // Campo 3: Senha
+          const Text(
+            'Senha',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          TextField(
+            key: const Key('register_password_field'),
+            controller: _passwordController,
+            obscureText: _obscurePassword,
+            autofillHints: const [AutofillHints.newPassword],
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.lock_outline, size: 20),
+              hintText: 'Crie uma senha forte',
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                  size: 20,
+                ),
+                onPressed: () =>
+                    setState(() => _obscurePassword = !_obscurePassword),
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-        // Checklist dos Requisitos
-        PasswordRequirementsCard(password: _currentPassword),
-        const SizedBox(height: 20),
+          // Campo 4: Confirmar Senha
+          const Text(
+            'Confirmar senha',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          TextField(
+            key: const Key('register_confirm_password_field'),
+            controller: _confirmPasswordController,
+            obscureText: _obscureConfirmPassword,
+            autofillHints: const [AutofillHints.newPassword],
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.lock_outline, size: 20),
+              hintText: 'Repita a senha criada',
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscureConfirmPassword
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                  size: 20,
+                ),
+                onPressed: () => setState(
+                  () => _obscureConfirmPassword = !_obscureConfirmPassword,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
 
-        // Botão Criar Conta
-        AppButton(
-          key: const Key('register_submit_button'),
-          label: 'Criar conta',
-          isLoading: widget.isLoading,
-          onPressed: _submit,
-        ),
-      ],
+          // Checklist dos Requisitos
+          PasswordRequirementsCard(password: _currentPassword),
+          const SizedBox(height: 20),
+
+          // Botão Criar Conta
+          AppButton(
+            key: const Key('register_submit_button'),
+            label: 'Criar conta',
+            isLoading: widget.isLoading,
+            onPressed: _submit,
+          ),
+        ],
+      ),
     );
   }
 }

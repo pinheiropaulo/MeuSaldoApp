@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meusaldo/app/routing/app_routes.dart';
@@ -43,6 +44,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     setState(() => _isLoading = false);
 
     if (result.isSuccess) {
+      TextInput.finishAutofillContext();
       await EmailConfirmationDialog.show(
         context,
         email: email,

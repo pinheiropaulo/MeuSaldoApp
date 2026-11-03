@@ -6,8 +6,11 @@ import 'package:meusaldo_core/meusaldo_core.dart';
 
 /// Seção superior da tela de contas com saldo consolidado e contagem de contas.
 class AccountsHeaderSection extends StatelessWidget {
-  /// Saldo financeiro consolidado de todas as contas ativas.
+  /// Saldo financeiro consolidado de todas as contas ativas (dinheiro livre).
   final Money consolidatedBalance;
+
+  /// Saldo total exclusivo em contas de benefícios (VR/VA).
+  final Money? benefitsBalance;
 
   /// Quantidade total de contas cadastradas.
   final int accountsCount;
@@ -15,6 +18,7 @@ class AccountsHeaderSection extends StatelessWidget {
   const AccountsHeaderSection({
     super.key,
     required this.consolidatedBalance,
+    this.benefitsBalance,
     required this.accountsCount,
   });
 
@@ -57,6 +61,42 @@ class AccountsHeaderSection extends StatelessWidget {
                     ? AppColors.expense
                     : AppColors.transfer,
               ),
+              if (benefitsBalance != null && !benefitsBalance!.isZero) ...[
+                const SizedBox(height: 12),
+                const Divider(height: 1, color: AppColors.outline),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(
+                          Icons.card_giftcard,
+                          size: 14,
+                          color: AppColors.primaryHighlight,
+                        ),
+                        SizedBox(width: 6),
+                        Text(
+                          'Benefícios (VR/VA)',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    MoneyDisplay(
+                      money: benefitsBalance!,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryHighlight,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),

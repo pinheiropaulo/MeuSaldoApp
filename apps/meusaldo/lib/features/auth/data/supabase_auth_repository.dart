@@ -26,7 +26,7 @@ class SupabaseAuthRepository implements AuthRepository {
       }
       return Result.success(_mapSupabaseUser(spUser));
     } on sp.AuthException catch (e) {
-      return Result.failure(ValidationFailure(e.message, code: e.statusCode));
+      return Result.failure(ValidationFailure(_translateAuthError(e), code: e.statusCode));
     } catch (e) {
       return Result.failure(BusinessRuleFailure('Erro ao autenticar: $e'));
     }
@@ -54,7 +54,7 @@ class SupabaseAuthRepository implements AuthRepository {
         _mapSupabaseUser(spUser, fallbackName: name.trim()),
       );
     } on sp.AuthException catch (e) {
-      return Result.failure(ValidationFailure(e.message, code: e.statusCode));
+      return Result.failure(ValidationFailure(_translateAuthError(e), code: e.statusCode));
     } catch (e) {
       return Result.failure(BusinessRuleFailure('Erro ao cadastrar usuário: $e'));
     }
@@ -66,7 +66,7 @@ class SupabaseAuthRepository implements AuthRepository {
       await _client.auth.signOut();
       return const Result.success(null);
     } on sp.AuthException catch (e) {
-      return Result.failure(ValidationFailure(e.message, code: e.statusCode));
+      return Result.failure(ValidationFailure(_translateAuthError(e), code: e.statusCode));
     } catch (e) {
       return Result.failure(BusinessRuleFailure('Erro ao encerrar sessão: $e'));
     }
@@ -121,7 +121,7 @@ class SupabaseAuthRepository implements AuthRepository {
       await _client.auth.resetPasswordForEmail(email.trim());
       return const Result.success(null);
     } on sp.AuthException catch (e) {
-      return Result.failure(ValidationFailure(e.message, code: e.statusCode));
+      return Result.failure(ValidationFailure(_translateAuthError(e), code: e.statusCode));
     } catch (e) {
       return Result.failure(BusinessRuleFailure('Erro ao redefinir senha: $e'));
     }
@@ -168,10 +168,38 @@ class SupabaseAuthRepository implements AuthRepository {
         ),
       );
     } on sp.AuthException catch (e) {
-      return Result.failure(ValidationFailure(e.message, code: e.statusCode));
+      return Result.failure(ValidationFailure(_translateAuthError(e), code: e.statusCode));
     } catch (e) {
       return Result.failure(BusinessRuleFailure('Erro ao atualizar perfil: $e'));
     }
+  }
+
+  String _translateAuthError(sp.AuthException e) {
+    final msg = e.message.toLowerCase();
+    if (msg.contains('missing email') || msg.contains('missing phone') || msg.contains('empty')) {
+      return 'Por favor, preencha o e-mail e a senha para continuar.';
+    }
+    if (msg.contains('invalid login credentials') ||
+        msg.contains('invalid credentials') ||
+        msg.contains('invalid grant')) {
+      return 'E-mail ou senha incorretos. Verifique seus dados e tente novamente.';
+    }
+    if (msg.contains('email not confirmed')) {
+      return 'E-mail ainda não confirmado. Verifique sua caixa de entrada para ativar a conta.';
+    }
+    if (msg.contains('user already registered') || msg.contains('already exists')) {
+      return 'Já existe uma conta cadastrada com este e-mail.';
+    }
+    if (msg.contains('at least 6 characters') || msg.contains('password should be')) {
+      return 'A senha deve conter no mínimo 6 caracteres.';
+    }
+    if (msg.contains('invalid email') || msg.contains('format')) {
+      return 'Por favor, informe um endereço de e-mail válido.';
+    }
+    if (msg.contains('rate limit') || msg.contains('too many requests')) {
+      return 'Muitas tentativas em pouco tempo. Aguarde alguns instantes antes de tentar novamente.';
+    }
+    return e.message;
   }
 
   User _mapSupabaseUser(sp.User spUser, {String? fallbackName}) {

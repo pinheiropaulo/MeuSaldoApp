@@ -65,7 +65,7 @@ class AccountDetailsScreen extends ConsumerWidget {
             tooltip: 'Editar conta',
             onPressed: () {
               try {
-                context.push('/accounts/${account.id}/edit');
+                context.push('/accounts/${account.id}/edit', extra: account);
               } catch (_) {
                 Navigator.of(context).push(MaterialPageRoute(
                   builder: (_) => EditAccountScreen(account: account),

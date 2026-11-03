@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meusaldo/app/routing/app_routes.dart';
@@ -28,6 +29,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   String? _errorMessage;
 
   Future<void> _handleLogin(String email, String password) async {
+    final trimmedEmail = email.trim();
+    if (trimmedEmail.isEmpty || password.isEmpty) {
+      setState(() {
+        _errorMessage =
+            'Por favor, informe seu e-mail e sua senha para continuar.';
+      });
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -36,7 +46,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final result = await ref
         .read(authStateProvider.notifier)
         .login(
-          email: email,
+          email: trimmedEmail,
           password: password,
         );
 
@@ -47,6 +57,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     if (result.isSuccess) {
+      TextInput.finishAutofillContext();
       if (widget.onLoginSuccess != null) {
         widget.onLoginSuccess!();
       } else {

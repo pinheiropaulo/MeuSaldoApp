@@ -37,10 +37,10 @@ class AccountTypeSelector extends StatelessWidget {
       Icons.payments,
     ),
     (
-      AccountType.digitalWallet,
-      'Carteira digital',
-      'Apps de pagamento, pré-pagos e virtuais',
-      Icons.account_balance_wallet,
+      AccountType.benefit,
+      'Benefícios / Vales',
+      'Vale refeição, alimentação, Flash, mobilidade',
+      Icons.card_giftcard,
     ),
     (
       AccountType.investment,

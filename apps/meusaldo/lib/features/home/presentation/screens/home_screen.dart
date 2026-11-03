@@ -18,11 +18,18 @@ import 'package:meusaldo/features/transactions/presentation/widgets/transaction_
 import 'package:meusaldo_core/meusaldo_core.dart';
 
 /// Tela orquestradora inicial (Dashboard / Resumo do mês).
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  bool _hasPromptedFirstAccount = false;
+
+  @override
+  Widget build(BuildContext context) {
     final user = ref.watch(authStateProvider).value;
     final accountsAsync = ref.watch(accountsListProvider);
     final accounts = accountsAsync.value ?? const [];
@@ -34,38 +41,23 @@ class HomeScreen extends ConsumerWidget {
     final upcomingAlert = ref.watch(homeUpcomingAlertProvider);
 
     // No primeiro acesso (quando o usuário não possui contas),
-    // aciona a tela para cadastrar sua primeira conta.
-    ref.listen<AsyncValue<List<FinancialAccount>>>(
-      accountsListProvider,
-      (prev, next) {
-        if (prev?.hasValue != true && next.hasValue && next.requireValue.isEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (context.mounted) {
-              AccountFormSheet.show(context);
-            }
-          });
+    // aciona deterministicamente o formulário para cadastrar a primeira conta.
+    if (accountsAsync.hasValue && accounts.isEmpty && !_hasPromptedFirstAccount) {
+      _hasPromptedFirstAccount = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          AccountFormSheet.show(context);
         }
-      },
-    );
+      });
+    }
 
     return Scaffold(
       appBar: AppBar(
         title: const Row(
           children: [
-            Icon(
-              Icons.account_balance_wallet,
-              color: AppColors.primaryHighlight,
-              size: 26,
-            ),
+            Icon(Icons.account_balance_wallet, color: AppColors.primaryHighlight, size: 26),
             SizedBox(width: 9),
-            Text(
-              'MeuSaldo',
-              style: TextStyle(
-                fontSize: 21,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.3,
-              ),
-            ),
+            Text('MeuSaldo', style: TextStyle(fontSize: 21, fontWeight: FontWeight.w700, letterSpacing: -0.3)),
           ],
         ),
         actions: [

@@ -70,13 +70,25 @@ final accountsListProvider =
   AccountsListNotifier.new,
 );
 
-/// Provedor do saldo consolidado de todas as contas ativas do usuário.
+/// Provedor do saldo consolidado de todas as contas ativas do usuário (dinheiro livre).
 final consolidatedBalanceProvider = Provider<Money>((ref) {
   final accountsAsync = ref.watch(accountsListProvider);
   return accountsAsync.maybeWhen(
     data: (accounts) {
       const calculator = BalanceCalculator();
       return calculator.calculateConsolidatedBalance(accounts);
+    },
+    orElse: () => const Money.zero(),
+  );
+});
+
+/// Provedor do saldo total exclusivo em benefícios corporativos (VR, VA, etc.).
+final benefitsBalanceProvider = Provider<Money>((ref) {
+  final accountsAsync = ref.watch(accountsListProvider);
+  return accountsAsync.maybeWhen(
+    data: (accounts) {
+      const calculator = BalanceCalculator();
+      return calculator.calculateBenefitsBalance(accounts);
     },
     orElse: () => const Money.zero(),
   );

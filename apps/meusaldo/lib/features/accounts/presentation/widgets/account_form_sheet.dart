@@ -193,9 +193,12 @@ class _AccountFormSheetState extends ConsumerState<AccountFormSheet> {
             BankNameAutocomplete(
               controller: _nameController,
               onBankSelected: (bank) {
-                if (bank.type.toLowerCase().contains('digital')) {
-                  setState(() => _selectedType = AccountType.digitalWallet);
-                } else if (bank.type.toLowerCase().contains('tradicional')) {
+                final lower = bank.type.toLowerCase();
+                if (lower.contains('benefício') || lower.contains('beneficio')) {
+                  setState(() => _selectedType = AccountType.benefit);
+                } else if (lower.contains('investimento')) {
+                  setState(() => _selectedType = AccountType.investment);
+                } else {
                   setState(() => _selectedType = AccountType.checking);
                 }
               },

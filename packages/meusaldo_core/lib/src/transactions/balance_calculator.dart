@@ -47,11 +47,30 @@ class BalanceCalculator {
     return balance;
   }
 
-  /// Calcula o saldo consolidado de todas as contas ativas do usuário.
-  Money calculateConsolidatedBalance(Iterable<FinancialAccount> accounts) {
+  /// Calcula o saldo consolidado de todas as contas ativas livres do usuário.
+  /// Contas do tipo benefício (VR/VA) são excluídas por padrão para não inflar o saldo livre.
+  Money calculateConsolidatedBalance(
+    Iterable<FinancialAccount> accounts, {
+    bool includeBenefits = false,
+  }) {
     return accounts.fold<Money>(
       const Money.zero(),
-      (total, account) => total + account.currentBalance,
+      (total, account) {
+        if (!account.isActive) return total;
+        if (!includeBenefits && account.type.isBenefit) return total;
+        return total + account.currentBalance;
+      },
+    );
+  }
+
+  /// Calcula o saldo total exclusivo em contas de benefícios corporativos (VR, VA, etc.).
+  Money calculateBenefitsBalance(Iterable<FinancialAccount> accounts) {
+    return accounts.fold<Money>(
+      const Money.zero(),
+      (total, account) {
+        if (!account.isActive || !account.type.isBenefit) return total;
+        return total + account.currentBalance;
+      },
     );
   }
 

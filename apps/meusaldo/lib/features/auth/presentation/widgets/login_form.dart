@@ -37,74 +37,78 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Text(
-          'E-mail',
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
+    return AutofillGroup(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'E-mail',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimary,
+            ),
           ),
-        ),
-        const SizedBox(height: 6),
-        TextField(
-          key: const Key('login_email_field'),
-          controller: _emailController,
-          keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(
-            prefixIcon: Icon(Icons.mail_outline, size: 20),
-            hintText: 'seu.email@exemplo.com',
+          const SizedBox(height: 6),
+          TextField(
+            key: const Key('login_email_field'),
+            controller: _emailController,
+            keyboardType: TextInputType.emailAddress,
+            autofillHints: const [AutofillHints.email, AutofillHints.username],
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.mail_outline, size: 20),
+              hintText: 'seu.email@exemplo.com',
+            ),
           ),
-        ),
-        const SizedBox(height: 14),
-        const Text(
-          'Senha',
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
+          const SizedBox(height: 14),
+          const Text(
+            'Senha',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimary,
+            ),
           ),
-        ),
-        const SizedBox(height: 6),
-        TextField(
-          key: const Key('login_password_field'),
-          controller: _passwordController,
-          obscureText: _obscurePassword,
-          decoration: InputDecoration(
-            prefixIcon: const Icon(Icons.lock_outline, size: 20),
-            hintText: 'Digite sua senha',
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscurePassword
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-                size: 20,
+          const SizedBox(height: 6),
+          TextField(
+            key: const Key('login_password_field'),
+            controller: _passwordController,
+            obscureText: _obscurePassword,
+            autofillHints: const [AutofillHints.password],
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.lock_outline, size: 20),
+              hintText: 'Digite sua senha',
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                  size: 20,
+                ),
+                onPressed: () =>
+                    setState(() => _obscurePassword = !_obscurePassword),
               ),
-              onPressed: () =>
-                  setState(() => _obscurePassword = !_obscurePassword),
             ),
           ),
-        ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton(
-            onPressed: () => context.push(AppRoutes.forgotPassword),
-            child: const Text(
-              'Esqueci minha senha',
-              style: TextStyle(fontSize: 12, color: AppColors.primaryHighlight),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () => context.push(AppRoutes.forgotPassword),
+              child: const Text(
+                'Esqueci minha senha',
+                style: TextStyle(fontSize: 12, color: AppColors.primaryHighlight),
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 8),
-        AppButton(
-          key: const Key('login_submit_button'),
-          label: 'Entrar',
-          isLoading: widget.isLoading,
-          onPressed: _submit,
-        ),
-      ],
+          const SizedBox(height: 8),
+          AppButton(
+            key: const Key('login_submit_button'),
+            label: 'Entrar',
+            isLoading: widget.isLoading,
+            onPressed: _submit,
+          ),
+        ],
+      ),
     );
   }
 }

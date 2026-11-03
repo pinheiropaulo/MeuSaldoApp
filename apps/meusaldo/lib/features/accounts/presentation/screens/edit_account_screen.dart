@@ -1,15 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meusaldo/app/theme/theme.dart';
 import 'package:meusaldo/features/accounts/presentation/state/account_details_providers.dart';
 import 'package:meusaldo/features/accounts/presentation/state/account_providers.dart';
-import 'package:meusaldo/features/accounts/presentation/widgets/edit/edit_account_balance_preview.dart';
-import 'package:meusaldo/features/accounts/presentation/widgets/edit/edit_account_danger_zone.dart';
-import 'package:meusaldo/features/accounts/presentation/widgets/edit/edit_account_form_fields.dart';
-import 'package:meusaldo/features/accounts/presentation/widgets/edit/edit_account_type_selector.dart';
+import 'package:meusaldo/features/accounts/presentation/widgets/edit/edit_account_form.dart';
 import 'package:meusaldo/shared/widgets/app_bottom_sheet.dart';
-import 'package:meusaldo/shared/widgets/app_button.dart';
 import 'package:meusaldo_core/meusaldo_core.dart';
 
 /// Tela orquestradora para edição dedicada de conta financeira e exclusão segura.
@@ -30,6 +28,7 @@ class _EditAccountScreenState extends ConsumerState<EditAccountScreen> {
   late AccountType _selectedType;
   bool _isSaving = false;
   bool _isDeleting = false;
+  bool _initialized = false;
 
   FinancialAccount? _getAccount() =>
       widget.account ??
@@ -50,20 +49,35 @@ class _EditAccountScreenState extends ConsumerState<EditAccountScreen> {
     super.dispose();
   }
 
+  void _showError(String msg) => ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(msg), backgroundColor: AppColors.expense),
+      );
+
+  Future<void> _runAsync(Future<void> Function() fn, {required void Function(bool) onLoading}) async {
+    onLoading(true);
+    try {
+      await fn().timeout(const Duration(seconds: 15));
+    } on TimeoutException {
+      if (mounted) _showError('Tempo esgotado. Verifique sua conexão.');
+    } catch (e) {
+      if (mounted) _showError('Erro: $e');
+    } finally {
+      if (mounted) onLoading(false);
+    }
+  }
+
   Future<void> _handleSave(FinancialAccount account) async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _isSaving = true);
-    final updated = account.copyWith(
-      name: _nameController.text.trim(),
-      type: _selectedType,
-    );
-    final result =
-        await ref.read(accountsListProvider.notifier).updateAccount(updated);
-    if (!mounted) return;
-    setState(() => _isSaving = false);
-    if (result.isSuccess && Navigator.of(context).canPop()) {
-      Navigator.of(context).pop();
-    }
+    await _runAsync(onLoading: (v) => setState(() => _isSaving = v), () async {
+      final updated = account.copyWith(name: _nameController.text.trim(), type: _selectedType);
+      final res = await ref.read(accountsListProvider.notifier).updateAccount(updated);
+      if (!mounted) return;
+      if (res.isSuccess) {
+        if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+      } else {
+        _showError(res.failureOrNull?.message ?? 'Erro ao salvar alterações.');
+      }
+    });
   }
 
   Future<void> _handleDelete(FinancialAccount account) async {
@@ -76,19 +90,15 @@ class _EditAccountScreenState extends ConsumerState<EditAccountScreen> {
       isDestructive: true,
     );
     if (confirmed != true || !mounted) return;
-
-    setState(() => _isDeleting = true);
-    final result =
-        await ref.read(accountsListProvider.notifier).deleteAccount(account.id);
-    if (!mounted) return;
-    setState(() => _isDeleting = false);
-    if (result.isSuccess) {
-      try {
-        context.go('/accounts');
-      } catch (_) {
-        if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+    await _runAsync(onLoading: (v) => setState(() => _isDeleting = v), () async {
+      final res = await ref.read(accountsListProvider.notifier).deleteAccount(account.id);
+      if (!mounted) return;
+      if (res.isSuccess) {
+        try { context.go('/accounts'); } catch (_) { if (Navigator.of(context).canPop()) Navigator.of(context).pop(); }
+      } else {
+        _showError(res.failureOrNull?.message ?? 'Erro ao excluir conta.');
       }
-    }
+    });
   }
 
   @override
@@ -99,6 +109,13 @@ class _EditAccountScreenState extends ConsumerState<EditAccountScreen> {
         appBar: AppBar(title: const Text('Editar conta')),
         body: const Center(child: Text('Conta não encontrada')),
       );
+    }
+    if (!_initialized) {
+      _initialized = true;
+      if (_nameController.text.isEmpty) {
+        _nameController.text = account.name;
+        _selectedType = account.type;
+      }
     }
 
     return Scaffold(
@@ -113,39 +130,17 @@ class _EditAccountScreenState extends ConsumerState<EditAccountScreen> {
           ),
         ],
       ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          children: [
-            EditAccountFormFields(nameController: _nameController),
-            const SizedBox(height: 16),
-            EditAccountTypeSelector(
-              selectedType: _selectedType,
-              onTypeChanged: (type) => setState(() => _selectedType = type),
-            ),
-            const SizedBox(height: 16),
-            EditAccountBalancePreview(balance: account.currentBalance),
-            const SizedBox(height: 16),
-            EditAccountDangerZone(
-              onDelete: () => _handleDelete(account),
-              isDeleting: _isDeleting,
-            ),
-            const SizedBox(height: 24),
-            AppButton(
-              label: 'Salvar alterações',
-              icon: Icons.check_circle,
-              isLoading: _isSaving,
-              onPressed: () => _handleSave(account),
-            ),
-            const SizedBox(height: 10),
-            AppButton.outlined(
-              label: 'Cancelar',
-              onPressed: () => Navigator.of(context).maybePop(),
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
+      body: EditAccountForm(
+        formKey: _formKey,
+        nameController: _nameController,
+        selectedType: _selectedType,
+        onTypeChanged: (type) => setState(() => _selectedType = type),
+        currentBalance: account.currentBalance,
+        onDelete: () => _handleDelete(account),
+        isDeleting: _isDeleting,
+        isSaving: _isSaving,
+        onSave: () => _handleSave(account),
+        onCancel: () => Navigator.of(context).maybePop(),
       ),
     );
   }

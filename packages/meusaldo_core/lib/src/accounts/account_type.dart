@@ -9,8 +9,8 @@ enum AccountType {
   /// Dinheiro físico/cédulas em espécie.
   cash('Dinheiro em espécie'),
 
-  /// Carteira digital, apps de pagamento e pré-pagos.
-  digitalWallet('Carteira digital'),
+  /// Benefícios corporativos (VR, VA, alimentação, refeição, Flash, mobilidade).
+  benefit('Benefícios'),
 
   /// Conta de investimento.
   investment('Investimentos');
@@ -18,4 +18,10 @@ enum AccountType {
   final String displayName;
 
   const AccountType(this.displayName);
+
+  /// Indica se esta conta faz parte do saldo bancário livre/líquido.
+  bool get isLiquidBalance => this != AccountType.benefit;
+
+  /// Indica se esta conta é de benefícios corporativos (VR/VA/Mobilidade).
+  bool get isBenefit => this == AccountType.benefit;
 }

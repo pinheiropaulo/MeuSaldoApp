@@ -44,7 +44,7 @@ create table if not exists public.accounts (
     id uuid primary key default gen_random_uuid(),
     user_id uuid not null references auth.users(id) on delete cascade,
     name text not null,
-    type text not null check (type in ('checking', 'savings', 'cash', 'digitalWallet', 'investment')),
+    type text not null check (type in ('checking', 'savings', 'cash', 'benefit', 'investment')),
     initial_balance_cents bigint not null default 0,
     current_balance_cents bigint not null default 0,
     is_active boolean not null default true,

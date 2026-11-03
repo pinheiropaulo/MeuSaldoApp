@@ -10,7 +10,7 @@ abstract final class AccountVisuals {
       AccountType.checking => Icons.account_balance,
       AccountType.savings => Icons.savings,
       AccountType.cash => Icons.payments,
-      AccountType.digitalWallet => Icons.account_balance_wallet,
+      AccountType.benefit => Icons.card_giftcard,
       AccountType.investment => Icons.trending_up,
     };
   }
@@ -38,7 +38,7 @@ abstract final class AccountVisuals {
     if (lowerName.contains('bradesco')) {
       return const Color(0xFFCC092F);
     }
-    if (lowerName.contains('santander')) {
+    if (lowerName.contains('santander') || lowerName.contains('ifood')) {
       return const Color(0xFFEA1D2C);
     }
     if (lowerName.contains('caixa')) {
@@ -53,6 +53,15 @@ abstract final class AccountVisuals {
     if (lowerName.contains('picpay')) {
       return const Color(0xFF11C76F);
     }
+    if (lowerName.contains('alelo') || lowerName.contains('vr')) {
+      return const Color(0xFF008850);
+    }
+    if (lowerName.contains('flash')) {
+      return const Color(0xFFFF467E);
+    }
+    if (lowerName.contains('caju')) {
+      return const Color(0xFFFF6200);
+    }
 
     return colorForType(account.type);
   }
@@ -63,7 +72,7 @@ abstract final class AccountVisuals {
       AccountType.checking => AppColors.transfer,
       AccountType.savings => AppColors.income,
       AccountType.cash => AppColors.alert,
-      AccountType.digitalWallet => const Color(0xFF9ECAFF),
+      AccountType.benefit => const Color(0xFFFF7A00),
       AccountType.investment => const Color(0xFF74DB9D),
     };
   }

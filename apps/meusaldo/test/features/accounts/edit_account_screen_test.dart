@@ -157,5 +157,40 @@ void main() {
       final activeAccounts = await repo.getAllAccounts();
       expect(activeAccounts.valueOrNull, isEmpty);
     });
+
+    testWidgets('exibe mensagem de erro e reabilita botão se updateAccount falhar',
+        (tester) async {
+      final repo = _FailingAccountRepository(initialAccounts: [initialAccount]);
+
+      await tester.pumpWidget(
+        _buildTestApp(account: initialAccount, repository: repo),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Benefícios / Vales'));
+      await tester.pumpAndSettle();
+
+      await tester.drag(find.byType(Form), const Offset(0, -600));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Salvar alterações'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Erro simulado no banco de dados'), findsOneWidget);
+      expect(find.text('Salvar alterações'), findsOneWidget);
+    });
   });
+}
+
+class _FailingAccountRepository extends InMemoryAccountRepository {
+  _FailingAccountRepository({super.initialAccounts});
+
+  @override
+  Future<Result<FinancialAccount, Failure>> updateAccount(
+    FinancialAccount account,
+  ) async {
+    return const Result.failure(
+      BusinessRuleFailure('Erro simulado no banco de dados'),
+    );
+  }
 }
