@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:meusaldo/features/categories/data/in_memory_category_repository.dart';
 import 'package:meusaldo/features/categories/presentation/state/category_providers.dart';
 import 'package:meusaldo/features/categories/presentation/widgets/category_picker_sheet.dart';

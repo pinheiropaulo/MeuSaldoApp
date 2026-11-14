@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:meusaldo/app/theme/theme.dart';
 import 'package:meusaldo/features/cards/presentation/widgets/card_carousel_item.dart';
 import 'package:meusaldo_core/meusaldo_core.dart';

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:meusaldo/app/theme/theme.dart';
 
 /// Item em destaque na Aba Mais para gerenciamento e pré-visualização de categorias.

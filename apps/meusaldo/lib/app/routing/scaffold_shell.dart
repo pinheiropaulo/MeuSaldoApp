@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Casca principal de navegação com barra inferior persistente (StatefulNavigationShell).
 class ScaffoldShell extends StatelessWidget {

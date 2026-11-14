@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:meusaldo/features/transactions/presentation/screens/recurring_transactions_screen.dart';
 import 'package:meusaldo/features/transactions/presentation/state/recurring_transaction_providers.dart';
 import 'package:meusaldo_core/meusaldo_core.dart';

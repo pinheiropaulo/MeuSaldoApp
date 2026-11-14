@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:meusaldo/app/theme/theme.dart';
 
 /// Diálogo de orientação ao usuário após cadastro para confirmação de e-mail.

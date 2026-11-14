@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:meusaldo/app/theme/theme.dart';
 import 'package:meusaldo/features/auth/presentation/widgets/splash_brand_hero.dart';
 import 'package:meusaldo/features/auth/presentation/widgets/splash_loading_status.dart';

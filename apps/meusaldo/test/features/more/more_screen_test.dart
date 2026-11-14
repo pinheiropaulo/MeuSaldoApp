@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:meusaldo/app/routing/app_routes.dart';
 import 'package:meusaldo/features/auth/presentation/state/auth_providers.dart';
 import 'package:meusaldo/features/more/presentation/screens/more_screen.dart';

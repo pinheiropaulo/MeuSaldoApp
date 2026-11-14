@@ -17,6 +17,7 @@ Este documento registra o estado do MVP e a sequência autorizada de evolução.
 
 ### Concluído
 
+- Upgrade Flutter 3.50 & Dart 3.14: framework elevado, adoção da biblioteca modular oficial `package:material_ui`, eliminação de resquícios Cupertino/iOS para foco exclusivo em Material Design 3 (Android) e 182 testes (52 core + 130 app) 100% aprovados.
 - Core financeiro: `Money`, erros/resultados, contas, categorias, transações, transferências, contratos de repositório e cálculos de saldo.
 - Fundação Flutter: tema Dark Burgundy, componentes compartilhados, `go_router` e Riverpod.
 - Fluxo visual MVP: Início, Contas e Lançamentos, incluindo formulários e detalhes de lançamento.

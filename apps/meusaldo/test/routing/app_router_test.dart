@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:meusaldo/app/app.dart';
 import 'package:meusaldo/features/auth/data/in_memory_auth_repository.dart';
 import 'package:meusaldo/features/auth/presentation/screens/login_screen.dart';

@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:meusaldo/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:meusaldo/features/auth/presentation/widgets/forgot_password/forgot_password_form.dart';
 import 'package:meusaldo/features/auth/presentation/widgets/forgot_password/forgot_password_success_card.dart';

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:meusaldo/app/theme/theme.dart';
 
 /// Banner informativo exibido na edição de lançamento para alertar sobre o recálculo automático de saldos.

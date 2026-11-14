@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:meusaldo/features/accounts/presentation/widgets/edit/edit_account_action_buttons.dart';
 import 'package:meusaldo/features/accounts/presentation/widgets/edit/edit_account_balance_preview.dart';
 import 'package:meusaldo/features/accounts/presentation/widgets/edit/edit_account_danger_zone.dart';

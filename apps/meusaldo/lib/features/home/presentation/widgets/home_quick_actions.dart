@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:meusaldo/app/theme/theme.dart';
 
 /// Bloco de atalhos rápidos para registro de despesas, receitas e transferências.

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:meusaldo/shared/widgets/app_button.dart';
 
 /// Botões de ação inferior (Salvar e Cancelar) da tela de edição de conta.

@@ -19,7 +19,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.13.5
+  sdk: ^3.14.0
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -32,16 +32,14 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  material_ui: ^1.11.0
 
   meusaldo_core:
     path: ../../packages/meusaldo_core
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
   go_router: ^18.1.1
   intl: ^0.20.3
-  google_fonts: ^6.2.1
+  google_fonts: ^9.0.0
   flutter_riverpod: ^3.4.3
   supabase_flutter: ^2.18.3
 

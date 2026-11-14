@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:meusaldo/app/theme/theme.dart';
 import 'package:meusaldo/shared/widgets/app_card.dart';
 import 'package:meusaldo/shared/widgets/money_display.dart';

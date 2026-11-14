@@ -12,6 +12,12 @@ Este documento é o catálogo de dependências do MeuSaldo. Antes de adicionar u
 
 ## Fundação adotada
 
+### `material_ui`
+
+- Uso: biblioteca oficial modular do Material Design 3 no Flutter 3.50+ (substitui o import legado `package:flutter/material.dart`).
+- Camada: `apps/meusaldo`.
+- Situação: instalado e em uso em todos os componentes visuais, temas e telas do app.
+
 ### `go_router`
 
 - Uso: rotas, redirecionamentos de autenticação, navegação entre features e barra inferior.
@@ -40,7 +46,7 @@ Este documento é o catálogo de dependências do MeuSaldo. Antes de adicionar u
 
 - Uso: Roboto e JetBrains Mono previstos no design system.
 - Camada: `apps/meusaldo`.
-- Situação: instalado e usado no tema. Antes de publicar, avaliar fontes empacotadas como assets para evitar dependência de rede em tempo de execução.
+- Situação: instalado (`^9.0.0`), compatível com Flutter 3.50 e `material_ui`. Antes de publicar, avaliar fontes empacotadas como assets para evitar dependência de rede em tempo de execução.
 
 ## Localização inicial
 
@@ -126,6 +132,7 @@ Localização significa idioma e formatos regionais, não geolocalização físi
 
 ## Decisões atuais de não adoção
 
+- Sem Cupertino/iOS: `cupertino_icons` e bibliotecas de estilo iOS foram removidas do projeto, garantindo foco estrito e exclusivo em Material Design 3 e ecossistema Android.
 - Sem `get_it`: Riverpod cobre a injeção de dependências inicialmente.
 - Sem Hive: se Drift for adotado, não manter dois bancos locais sem necessidade.
 - Sem bibliotecas de dinheiro: `Money` próprio, baseado em centavos inteiros, é suficiente para o domínio inicial.

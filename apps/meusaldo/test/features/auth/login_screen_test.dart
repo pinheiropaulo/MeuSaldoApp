@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:meusaldo/features/auth/presentation/screens/login_screen.dart';
 import 'package:meusaldo/features/auth/presentation/state/auth_providers.dart';
 import 'package:meusaldo/features/auth/presentation/widgets/auth_error_banner.dart';
